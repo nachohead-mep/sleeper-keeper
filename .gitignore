@@ -1,0 +1,24 @@
+# Data files — keep local only
+Data/
+Output/
+
+# R artifacts
+.Rhistory
+.RData
+.Rproj.user/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+~$*
+
+# Archives
+*.zip
