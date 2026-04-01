@@ -30,8 +30,8 @@ from googleapiclient.discovery import build as google_build
 # ---------------------------------------------------------------------------
 # League rules (Article VI) — update these if the constitution is amended
 # ---------------------------------------------------------------------------
-LEAGUE_NAME = "Delta Fantasy Football League"
-_MEMBER_USER_ID = "737386559564894208"  # DannyN
+LEAGUE_NAME = os.environ.get("SLEEPER_LEAGUE_NAME", "Delta Fantasy Football League")
+_MEMBER_USER_ID = os.environ.get("SLEEPER_MEMBER_USER_ID", "737386559564894208")
 NFL_WEEKS = 18
 DRAFT_ROUNDS = 16
 NUM_TEAMS = 12

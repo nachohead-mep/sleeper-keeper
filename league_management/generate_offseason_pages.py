@@ -28,13 +28,13 @@ from delta_offseason_prep import build_rookie_draft_rows
 # ---------------------------------------------------------------------------
 # Config — update Apps Script URLs after deploying
 # ---------------------------------------------------------------------------
-# Single Apps Script URL — deploy apps_script_combined.js, paste URL here.
-# Keepers and proposals are routed via ?action= param and body.action field.
-APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2qVlCiJXTVzBkksauGabXjXaxuPM0AE1-6-CFn36XcL6vG6JkOSf_uU_dXNlgjoDaeQ/exec"
+# Apps Script URL — set via environment variable (kept secret for public repos).
+# Deploy apps_script_combined.js and set APPS_SCRIPT_URL in env or GitHub Secrets.
+APPS_SCRIPT_URL = os.environ.get("APPS_SCRIPT_URL", "")
 APPS_SCRIPT_KEEPERS_URL = APPS_SCRIPT_URL
 APPS_SCRIPT_PROPOSALS_URL = APPS_SCRIPT_URL + "?action=proposals" if APPS_SCRIPT_URL else ""
 
-PAGES_BASE_URL = "https://nachohead-mep.github.io/nfl-fantasy"
+PAGES_BASE_URL = os.environ.get("PAGES_BASE_URL", "https://nachohead-mep.github.io/sleeper-keeper")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 

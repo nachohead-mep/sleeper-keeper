@@ -31,6 +31,10 @@ jobs:
       - name: Generate pages
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-creds.json
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          SLEEPER_LEAGUE_NAME: ${{ secrets.SLEEPER_LEAGUE_NAME }}
+          SLEEPER_MEMBER_USER_ID: ${{ secrets.SLEEPER_MEMBER_USER_ID }}
+          PAGES_BASE_URL: ${{ vars.PAGES_BASE_URL }}
         run: |
           YEAR="${{ github.event.inputs.year }}"
           if [ -z "$YEAR" ]; then
@@ -43,4 +47,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./pages
-          commit_message: 'Update Delta League offseason pages'
+          commit_message: 'Update offseason pages'
