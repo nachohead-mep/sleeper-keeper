@@ -99,35 +99,34 @@ def generate_og_image(output_dir, year):
     draw.rectangle([0, 0, 4, HEIGHT], fill=ACCENT)
     draw.rectangle([WIDTH - 4, 0, WIDTH, HEIGHT], fill=ACCENT)
 
-    # Draw logo natively with Pillow (delta triangle + football)
-    logo_size = 180
-    lx = (WIDTH - logo_size) // 2
+    # Render SVG logo
+    logo_path = os.path.join(script_dir, '..', 'assets', 'delta-logo.svg')
+    try:
+        import cairosvg
+        from io import BytesIO
+        logo_png = cairosvg.svg2png(url=logo_path, output_width=180, output_height=180,
+                                     background_color=BG)
+        logo_img = Image.open(BytesIO(logo_png)).convert("RGBA")
+    except (ImportError, OSError):
+        # Fallback: draw simple delta + football with Pillow
+        logo_img = Image.new("RGBA", (180, 180), (0, 0, 0, 0))
+        ldraw = ImageDraw.Draw(logo_img)
+        ldraw.polygon([(90, 10), (20, 155), (160, 155)], fill=ACCENT)
+        ldraw.polygon([(90, 55), (48, 138), (132, 138)], fill=BG)
+        ball_layer = Image.new("RGBA", (90, 50), (0, 0, 0, 0))
+        bdraw = ImageDraw.Draw(ball_layer)
+        bdraw.ellipse([0, 0, 89, 49], fill="#A0522D", outline="#5C2D06", width=2)
+        bdraw.line([(30, 25), (60, 25)], fill="white", width=3)
+        for dx in [37, 43, 49, 55]:
+            bdraw.line([(dx, 20), (dx, 30)], fill="white", width=2)
+        ball_layer = ball_layer.rotate(35, expand=True, resample=Image.BICUBIC)
+        bx = 90 - ball_layer.width // 2
+        by = 95 - ball_layer.height // 2
+        logo_img.paste(ball_layer, (bx, by), ball_layer)
+
+    lx = (WIDTH - 180) // 2
     ly = 30
-
-    # Delta triangle (outer)
-    outer = [(lx + 90, ly + 10), (lx + 20, ly + 155), (lx + 160, ly + 155)]
-    draw.polygon(outer, fill=ACCENT)
-    # Inner cutout
-    inner = [(lx + 90, ly + 55), (lx + 48, ly + 138), (lx + 132, ly + 138)]
-    draw.polygon(inner, fill=BG)
-
-    # Football (rotated ellipse approximation in the center)
-    from PIL import Image as PILImage
-    ball_w, ball_h = 90, 50
-    ball_img = PILImage.new("RGBA", (ball_w * 2, ball_h * 2), (0, 0, 0, 0))
-    ball_draw = ImageDraw.Draw(ball_img)
-    ball_draw.ellipse([ball_w // 2, ball_h // 2, ball_w * 3 // 2, ball_h * 3 // 2],
-                      fill="#A0522D", outline="#5C2D06", width=2)
-    # Laces
-    cx, cy = ball_w, ball_h
-    ball_draw.line([(cx - 15, cy), (cx + 15, cy)], fill="white", width=3)
-    for dx in [-8, -2, 4, 10]:
-        ball_draw.line([(cx + dx, cy - 5), (cx + dx, cy + 5)], fill="white", width=2)
-    ball_img = ball_img.rotate(35, expand=True, resample=PILImage.BICUBIC)
-    # Paste football centered in delta hole
-    fx = lx + 90 - ball_img.width // 2
-    fy = ly + 95 - ball_img.height // 2
-    img.paste(ball_img, (fx, fy), ball_img)
+    img.paste(logo_img, (lx, ly), logo_img)
 
     # Title
     font_title = load_font(72, bold=True)
