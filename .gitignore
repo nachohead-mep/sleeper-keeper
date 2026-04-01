@@ -7,6 +7,9 @@ Output/
 .RData
 .Rproj.user/
 
+# Secrets
+.env
+
 # Python
 __pycache__/
 *.pyc

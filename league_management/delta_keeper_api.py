@@ -20,6 +20,9 @@ Players dropped after the deadline should be manually flagged.
 """
 
 import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env'))
+
 import requests
 import pandas as pd
 import datetime

@@ -10,4 +10,5 @@ dependencies = [
     "google-api-python-client==2.166.0",
     "Pillow==11.2.1",
     "cairosvg>=2.9.0",
+    "python-dotenv>=1.2.2",
 ]
