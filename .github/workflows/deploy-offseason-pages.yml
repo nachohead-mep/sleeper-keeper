@@ -1,0 +1,46 @@
+name: Deploy Offseason Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Offseason year (e.g., 2026)'
+        required: false
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install dependencies
+        run: uv sync
+        working-directory: .
+
+      - name: Write Google credentials
+        run: echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" | base64 -d > /tmp/gcloud-creds.json
+
+      - name: Generate pages
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-creds.json
+        run: |
+          YEAR="${{ github.event.inputs.year }}"
+          if [ -z "$YEAR" ]; then
+            YEAR=$(date +%Y)
+          fi
+          uv run python league_management/generate_offseason_pages.py --output pages --year "$YEAR"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          commit_message: 'Update Delta League offseason pages'

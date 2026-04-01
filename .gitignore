@@ -11,6 +11,10 @@ Output/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.venv/
+
+# Generated pages (deployed via gh-pages branch)
+pages/
 
 # Logs
 *.log

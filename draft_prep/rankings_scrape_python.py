@@ -827,7 +827,7 @@ if draft_type == 'auction':
     rookies_df_merged.sort_values('fpros_dynasty_rookie_rank', ascending = True, inplace = True)
 else:
     rookies_df_merged.dropna(subset=['ovr_adp'], inplace=True)
-    rookies_df_merged['adp_round'] = (1 + ((rookies_df_merged['ovr_adp']-1) / 12)).apply(math.floor)
+    rookies_df_merged['adp_round'] = (1 + ((rookies_df_merged['ovr_adp']-1) / 12)).round().astype(int)
     rookies_df_merged.sort_values('ovr_adp', ascending = True, inplace = True)
     rookies_df_merged['adp_round'] = [x if x < 17 else 16 for x in rookies_df_merged['adp_round']]
     rookies_df_merged =  rookies_df_merged[['fpros_dynasty_rookie_rank', 'position', 'team', 'bye', 'pos_adp','adp_round', 'player_name'] + analyst_cols + ['analyst_average', 'drafted_round', 'drafted_pick', 'drafted_ovr', 'status', 'manager_name']]
