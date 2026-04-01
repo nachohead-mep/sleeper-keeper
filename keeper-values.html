@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Keeper Values 2026">
+    <meta property="og:description" content="Full roster keeper values with filtering">
+    <meta property="og:image" content="https://nachohead-mep.github.io/nfl-fantasy/images/og-default.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Keeper Values 2026">
+    <meta name="twitter:description" content="Full roster keeper values with filtering">
+    <meta name="twitter:image" content="https://nachohead-mep.github.io/nfl-fantasy/images/og-default.png">
+    <title>Keeper Values 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="site-nav">
+    <a class="site-nav-home" href="index.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="24" height="24">
+  <defs>
+    <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4742F"/>
+      <stop offset="40%" stop-color="#A0522D"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <linearGradient id="deltaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Clip: only show football inside the delta's inner triangle (the hole) -->
+    <clipPath id="deltaHole">
+      <path d="M100,72 L60,148 L140,148 Z"/>
+    </clipPath>
+    <clipPath id="exitTopLeft">
+      <!-- Area below the delta's inner bottom edge only (bottom-left exit) -->
+      <polygon points="0,148 60,148 0,200"/>
+    </clipPath>
+    <clipPath id="exitBottomRight">
+      <!-- Area below and to the right of the delta's inner triangle -->
+      <polygon points="200,0 100,72 140,148 200,200 200,0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full delta drawn as one solid piece (back layer) -->
+  <g filter="url(#shadow)">
+    <!-- Outer triangle -->
+    <path d="M100,25 L40,160 L160,160 Z" fill="url(#deltaGrad)"/>
+    <!-- Inner cutout (matches background) -->
+    <path d="M100,72 L60,148 L140,148 Z" fill="#1a1d24"/>
+  </g>
+
+  <!-- Football - clipped to only show through the delta's hole -->
+  <g clip-path="url(#deltaHole)">
+    <g transform="translate(100, 112) rotate(-35)" filter="url(#shadow)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-left (in front of delta) -->
+  <g clip-path="url(#exitTopLeft)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-right (in front of delta) -->
+  <g clip-path="url(#exitBottomRight)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Motion lines -->
+  <g opacity="0.3" stroke="#60a5fa" stroke-width="2" stroke-linecap="round">
+    <line x1="155" y1="78" x2="175" y2="65"/>
+    <line x1="158" y1="88" x2="182" y2="79"/>
+    <line x1="156" y1="98" x2="178" y2="93"/>
+  </g>
+</svg>
+ Delta League</a>
+</nav>
+<div class="container">
+    <div class="page-header">
+        <div class="page-header-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="64" height="64">
+  <defs>
+    <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4742F"/>
+      <stop offset="40%" stop-color="#A0522D"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <linearGradient id="deltaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Clip: only show football inside the delta's inner triangle (the hole) -->
+    <clipPath id="deltaHole">
+      <path d="M100,72 L60,148 L140,148 Z"/>
+    </clipPath>
+    <clipPath id="exitTopLeft">
+      <!-- Area below the delta's inner bottom edge only (bottom-left exit) -->
+      <polygon points="0,148 60,148 0,200"/>
+    </clipPath>
+    <clipPath id="exitBottomRight">
+      <!-- Area below and to the right of the delta's inner triangle -->
+      <polygon points="200,0 100,72 140,148 200,200 200,0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full delta drawn as one solid piece (back layer) -->
+  <g filter="url(#shadow)">
+    <!-- Outer triangle -->
+    <path d="M100,25 L40,160 L160,160 Z" fill="url(#deltaGrad)"/>
+    <!-- Inner cutout (matches background) -->
+    <path d="M100,72 L60,148 L140,148 Z" fill="#1a1d24"/>
+  </g>
+
+  <!-- Football - clipped to only show through the delta's hole -->
+  <g clip-path="url(#deltaHole)">
+    <g transform="translate(100, 112) rotate(-35)" filter="url(#shadow)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-left (in front of delta) -->
+  <g clip-path="url(#exitTopLeft)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-right (in front of delta) -->
+  <g clip-path="url(#exitBottomRight)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Motion lines -->
+  <g opacity="0.3" stroke="#60a5fa" stroke-width="2" stroke-linecap="round">
+    <line x1="155" y1="78" x2="175" y2="65"/>
+    <line x1="158" y1="88" x2="182" y2="79"/>
+    <line x1="156" y1="98" x2="178" y2="93"/>
+  </g>
+</svg>
+</div>
+        <h1>Keeper Values 2026</h1>
+        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible</p>
+        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
+    </div>
+
+    <div class="filter-bar">
+        <label for="team-filter">Team:</label>
+        <select id="team-filter">
+            <option value="">All Teams</option>
+            <option value="DannyN">DannyN</option><option value="Friedo">Friedo</option><option value="Gohrdo">Gohrdo</option><option value="JoshWasserman">JoshWasserman</option><option value="ashanes">ashanes</option><option value="dbleykhman">dbleykhman</option><option value="jaw7475">jaw7475</option><option value="jpersily">jpersily</option><option value="skippo">skippo</option><option value="spencerrubin7">spencerrubin7</option><option value="zachjd5">zachjd5</option><option value="zachmassey">zachmassey</option>
+        </select>
+        <label class="toggle-label">
+            <input type="checkbox" id="eligible-toggle"> Eligible only
+        </label>
+        <label for="pos-filter">Position:</label>
+        <select id="pos-filter">
+            <option value="">All</option>
+            <option value="QB">QB</option>
+            <option value="RB">RB</option>
+            <option value="WR">WR</option>
+            <option value="TE">TE</option>
+            <option value="K">K</option>
+            <option value="DEF">DEF</option>
+        </select>
+    </div>
+
+    <table class="data-table" id="keeper-table">
+        <thead><tr>
+            <th data-col="0">Team <span class="sort-arrow"></span></th>
+            <th data-col="1">Player <span class="sort-arrow"></span></th>
+            <th data-col="2">Pos <span class="sort-arrow"></span></th>
+            <th data-col="3">Drafted Rd <span class="sort-arrow"></span></th>
+            <th data-col="4" class="col-hide-mobile">Pick <span class="sort-arrow"></span></th>
+            <th data-col="5" class="col-hide-mobile">FAAB <span class="sort-arrow"></span></th>
+            <th data-col="6">Eligible <span class="sort-arrow"></span></th>
+            <th data-col="7">Kept <span class="sort-arrow"></span></th>
+            <th data-col="8">Keeper Rd <span class="sort-arrow"></span></th>
+        </tr></thead>
+        <tbody>
+<tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>DJ Moore</td>
+    <td>WR</td>
+    <td>4</td>
+    <td class="col-hide-mobile">40</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Jaxon Smith-Njigba</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">57</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Mark Andrews</td>
+    <td>TE</td>
+    <td>6</td>
+    <td class="col-hide-mobile">64</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Chase Brown</td>
+    <td>RB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">88</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Trey Benson</td>
+    <td>RB</td>
+    <td>10</td>
+    <td class="col-hide-mobile">115</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Kyle Pitts</td>
+    <td>TE</td>
+    <td>10</td>
+    <td class="col-hide-mobile">112</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Chase McLaughlin</td>
+    <td>K</td>
+    <td>14</td>
+    <td class="col-hide-mobile">160</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Oronde Gadsden</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Jaxson Dart</td>
+    <td>QB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">9</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Chimere Dike</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">5</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Jacoby Brissett</td>
+    <td>QB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">1</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="DannyN" data-eligible="false">
+    <td>DannyN</td>
+    <td>Taysom Hill</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">20</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Greg Dortch</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Ty Johnson</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">6</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Devin Singletary</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">4</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Kenneth Gainwell</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="DannyN" data-eligible="true">
+    <td>DannyN</td>
+    <td>Green Bay Packers</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
+    <td>Friedo</td>
+    <td>Christian McCaffrey</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">8</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
+    <td>Friedo</td>
+    <td>Amon-Ra St. Brown</td>
+    <td>WR</td>
+    <td>1</td>
+    <td class="col-hide-mobile">9</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Lamar Jackson</td>
+    <td>QB</td>
+    <td>2</td>
+    <td class="col-hide-mobile">17</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Drake London</td>
+    <td>WR</td>
+    <td>3</td>
+    <td class="col-hide-mobile">35</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>George Pickens</td>
+    <td>WR</td>
+    <td>3</td>
+    <td class="col-hide-mobile">28</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Deebo Samuel</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">51</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
+    <td>Friedo</td>
+    <td>Josh Downs</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">58</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Brian Robinson</td>
+    <td>RB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">75</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Emeka Egbuka</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Trey McBride</td>
+    <td>TE</td>
+    <td>10</td>
+    <td class="col-hide-mobile">118</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>7</strong></td>
+</tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
+    <td>Friedo</td>
+    <td>Jake Bates</td>
+    <td>K</td>
+    <td>11</td>
+    <td class="col-hide-mobile">129</td>
+    <td class="col-hide-mobile">2</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Bucky Irving</td>
+    <td>RB</td>
+    <td>12</td>
+    <td class="col-hide-mobile">137</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>10</strong></td>
+</tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
+    <td>Friedo</td>
+    <td>Brock Purdy</td>
+    <td>QB</td>
+    <td>12</td>
+    <td class="col-hide-mobile">136</td>
+    <td class="col-hide-mobile">11</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Houston Texans</td>
+    <td>DEF</td>
+    <td>15</td>
+    <td class="col-hide-mobile">179</td>
+    <td class="col-hide-mobile">1</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Rico Dowdle</td>
+    <td>RB</td>
+    <td>16</td>
+    <td class="col-hide-mobile">192</td>
+    <td class="col-hide-mobile">4</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Los Angeles Rams</td>
+    <td>DEF</td>
+    <td>16</td>
+    <td class="col-hide-mobile">189</td>
+    <td class="col-hide-mobile">5</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="Friedo" data-eligible="true">
+    <td>Friedo</td>
+    <td>Emanuel Wilson</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">20</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr class="ineligible" data-team="Gohrdo" data-eligible="false">
+    <td>Gohrdo</td>
+    <td>Jahmyr Gibbs</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">2</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>DK Metcalf</td>
+    <td>WR</td>
+    <td>2</td>
+    <td class="col-hide-mobile">23</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Terry McLaurin</td>
+    <td>WR</td>
+    <td>3</td>
+    <td class="col-hide-mobile">26</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Jaylen Waddle</td>
+    <td>WR</td>
+    <td>4</td>
+    <td class="col-hide-mobile">47</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Cooper Kupp</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">50</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>De'Von Achane</td>
+    <td>RB</td>
+    <td>6</td>
+    <td class="col-hide-mobile">71</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Rhamondre Stevenson</td>
+    <td>RB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">95</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Justin Herbert</td>
+    <td>QB</td>
+    <td>9</td>
+    <td class="col-hide-mobile">98</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Quinshon Judkins</td>
+    <td>RB</td>
+    <td>10</td>
+    <td class="col-hide-mobile">119</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Jake Ferguson</td>
+    <td>TE</td>
+    <td>12</td>
+    <td class="col-hide-mobile">143</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Hunter Henry</td>
+    <td>TE</td>
+    <td>14</td>
+    <td class="col-hide-mobile">159</td>
+    <td class="col-hide-mobile">7</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Jason Myers</td>
+    <td>K</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="Gohrdo" data-eligible="false">
+    <td>Gohrdo</td>
+    <td>Jonnu Smith</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Daniel Jones</td>
+    <td>QB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>John Metchie</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">18</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Christian Watson</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
+    <td>Gohrdo</td>
+    <td>Cleveland Browns</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">4</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Kenneth Walker</td>
+    <td>RB</td>
+    <td>2</td>
+    <td class="col-hide-mobile">21</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>TreVeyon Henderson</td>
+    <td>RB</td>
+    <td>5</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Jayden Reed</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">68</td>
+    <td class="col-hide-mobile">7</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Matthew Golden</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Tyler Warren</td>
+    <td>TE</td>
+    <td>9</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>J.J. McCarthy</td>
+    <td>QB</td>
+    <td>13</td>
+    <td class="col-hide-mobile">151</td>
+    <td class="col-hide-mobile">2</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Jacory Croskey-Merritt</td>
+    <td>RB</td>
+    <td>13</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Denver Broncos</td>
+    <td>DEF</td>
+    <td>13</td>
+    <td class="col-hide-mobile">147</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Tyler Allgeier</td>
+    <td>RB</td>
+    <td>14</td>
+    <td class="col-hide-mobile">166</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>Jalen Coker</td>
+    <td>WR</td>
+    <td>15</td>
+    <td class="col-hide-mobile">172</td>
+    <td class="col-hide-mobile">3</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>Cam Little</td>
+    <td>K</td>
+    <td>16</td>
+    <td class="col-hide-mobile">183</td>
+    <td class="col-hide-mobile">2</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>Audric Estime</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>Adonai Mitchell</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">9</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="JoshWasserman" data-eligible="false">
+    <td>JoshWasserman</td>
+    <td>Colby Parkinson</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">7</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Kayshon Boutte</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">11</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="JoshWasserman" data-eligible="true">
+    <td>JoshWasserman</td>
+    <td>Quentin Johnston</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">8</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr class="ineligible" data-team="ashanes" data-eligible="false">
+    <td>ashanes</td>
+    <td>Ja'Marr Chase</td>
+    <td>WR</td>
+    <td>1</td>
+    <td class="col-hide-mobile">1</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="ashanes" data-eligible="false">
+    <td>ashanes</td>
+    <td>Jalen Hurts</td>
+    <td>QB</td>
+    <td>2</td>
+    <td class="col-hide-mobile">24</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>1</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Breece Hall</td>
+    <td>RB</td>
+    <td>3</td>
+    <td class="col-hide-mobile">31</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Ladd McConkey</td>
+    <td>WR</td>
+    <td>8</td>
+    <td class="col-hide-mobile">96</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Javonte Williams</td>
+    <td>RB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">85</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Michael Pittman</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">108</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Rashee Rice</td>
+    <td>WR</td>
+    <td>10</td>
+    <td class="col-hide-mobile">120</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Brandon Aubrey</td>
+    <td>K</td>
+    <td>11</td>
+    <td class="col-hide-mobile">121</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Keenan Allen</td>
+    <td>WR</td>
+    <td>12</td>
+    <td class="col-hide-mobile">144</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Caleb Williams</td>
+    <td>QB</td>
+    <td>13</td>
+    <td class="col-hide-mobile">145</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="ashanes" data-eligible="false">
+    <td>ashanes</td>
+    <td>Minnesota Vikings</td>
+    <td>DEF</td>
+    <td>14</td>
+    <td class="col-hide-mobile">157</td>
+    <td class="col-hide-mobile">7</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Dallas Goedert</td>
+    <td>TE</td>
+    <td>15</td>
+    <td class="col-hide-mobile">169</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Troy Franklin</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">7</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Juwan Johnson</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="ashanes" data-eligible="true">
+    <td>ashanes</td>
+    <td>Zonovan Knight</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="ashanes" data-eligible="false">
+    <td>ashanes</td>
+    <td>Malik Davis</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">6</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="ashanes" data-eligible="false">
+    <td>ashanes</td>
+    <td>Tampa Bay Buccaneers</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">14</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="dbleykhman" data-eligible="false">
+    <td>dbleykhman</td>
+    <td>CeeDee Lamb</td>
+    <td>WR</td>
+    <td>1</td>
+    <td class="col-hide-mobile">4</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>A.J. Brown</td>
+    <td>WR</td>
+    <td>2</td>
+    <td class="col-hide-mobile">14</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>D'Andre Swift</td>
+    <td>RB</td>
+    <td>3</td>
+    <td class="col-hide-mobile">32</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Garrett Wilson</td>
+    <td>WR</td>
+    <td>4</td>
+    <td class="col-hide-mobile">45</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>1</strong></td>
+</tr><tr class="ineligible" data-team="dbleykhman" data-eligible="false">
+    <td>dbleykhman</td>
+    <td>Xavier Worthy</td>
+    <td>WR</td>
+    <td>7</td>
+    <td class="col-hide-mobile">76</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>1</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Kyren Williams</td>
+    <td>RB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">77</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Jaylen Warren</td>
+    <td>RB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">81</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Drake Maye</td>
+    <td>QB</td>
+    <td>10</td>
+    <td class="col-hide-mobile">110</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Nico Collins</td>
+    <td>WR</td>
+    <td>10</td>
+    <td class="col-hide-mobile">113</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Dalton Kincaid</td>
+    <td>TE</td>
+    <td>11</td>
+    <td class="col-hide-mobile">131</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Tyrone Tracy</td>
+    <td>RB</td>
+    <td>12</td>
+    <td class="col-hide-mobile">133</td>
+    <td class="col-hide-mobile">65</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Ka'imi Fairbairn</td>
+    <td>K</td>
+    <td>16</td>
+    <td class="col-hide-mobile">182</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="dbleykhman" data-eligible="false">
+    <td>dbleykhman</td>
+    <td>AJ Barner</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Dalton Schultz</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Wan'Dale Robinson</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">27</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>Buffalo Bills</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td>dbleykhman</td>
+    <td>New England Patriots</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Rome Odunze</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">49</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
+    <td>jaw7475</td>
+    <td>Jordan Addison</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">55</td>
+    <td class="col-hide-mobile">1</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Tetairoa McMillan</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Jordan Mason</td>
+    <td>RB</td>
+    <td>6</td>
+    <td class="col-hide-mobile">65</td>
+    <td class="col-hide-mobile">2</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Brock Bowers</td>
+    <td>TE</td>
+    <td>7</td>
+    <td class="col-hide-mobile">84</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Cam Skattebo</td>
+    <td>RB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">73</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Zach Charbonnet</td>
+    <td>RB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">90</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Jauan Jennings</td>
+    <td>WR</td>
+    <td>12</td>
+    <td class="col-hide-mobile">135</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Tucker Kraft</td>
+    <td>TE</td>
+    <td>12</td>
+    <td class="col-hide-mobile">141</td>
+    <td class="col-hide-mobile">4</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Ollie Gordon</td>
+    <td>RB</td>
+    <td>13</td>
+    <td class="col-hide-mobile">148</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Woody Marks</td>
+    <td>RB</td>
+    <td>15</td>
+    <td class="col-hide-mobile">175</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Chris Rodriguez</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
+    <td>jaw7475</td>
+    <td>Jawhar Jordan</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
+    <td>jaw7475</td>
+    <td>Andy Borregales</td>
+    <td>K</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="jaw7475" data-eligible="true">
+    <td>jaw7475</td>
+    <td>Matthew Stafford</td>
+    <td>QB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">12</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
+    <td>jaw7475</td>
+    <td>Michael Carter</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">28</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
+    <td>jaw7475</td>
+    <td>Atlanta Falcons</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>David Montgomery</td>
+    <td>RB</td>
+    <td>3</td>
+    <td class="col-hide-mobile">29</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Patrick Mahomes</td>
+    <td>QB</td>
+    <td>4</td>
+    <td class="col-hide-mobile">38</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>T.J. Hockenson</td>
+    <td>TE</td>
+    <td>4</td>
+    <td class="col-hide-mobile">44</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Jakobi Meyers</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">53</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Evan Engram</td>
+    <td>TE</td>
+    <td>7</td>
+    <td class="col-hide-mobile">74</td>
+    <td class="col-hide-mobile">4</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Brandon Aiyuk</td>
+    <td>WR</td>
+    <td>7</td>
+    <td class="col-hide-mobile">80</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Keon Coleman</td>
+    <td>WR</td>
+    <td>8</td>
+    <td class="col-hide-mobile">89</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Jared Goff</td>
+    <td>QB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">92</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Chuba Hubbard</td>
+    <td>RB</td>
+    <td>9</td>
+    <td class="col-hide-mobile">101</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Tyjae Spears</td>
+    <td>RB</td>
+    <td>11</td>
+    <td class="col-hide-mobile">125</td>
+    <td class="col-hide-mobile">2</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Harrison Butker</td>
+    <td>K</td>
+    <td>12</td>
+    <td class="col-hide-mobile">140</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Rashid Shaheed</td>
+    <td>WR</td>
+    <td>12</td>
+    <td class="col-hide-mobile">138</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Philadelphia Eagles</td>
+    <td>DEF</td>
+    <td>13</td>
+    <td class="col-hide-mobile">149</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Trevor Lawrence</td>
+    <td>QB</td>
+    <td>15</td>
+    <td class="col-hide-mobile">173</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Tez Johnson</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">9</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Romeo Doubs</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">10</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="jpersily" data-eligible="true">
+    <td>jpersily</td>
+    <td>Jacksonville Jaguars</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">5</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Saquon Barkley</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">5</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Bijan Robinson</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">3</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Marvin Harrison</td>
+    <td>WR</td>
+    <td>2</td>
+    <td class="col-hide-mobile">20</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>George Kittle</td>
+    <td>TE</td>
+    <td>2</td>
+    <td class="col-hide-mobile">22</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Davante Adams</td>
+    <td>WR</td>
+    <td>3</td>
+    <td class="col-hide-mobile">27</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>James Cook</td>
+    <td>RB</td>
+    <td>6</td>
+    <td class="col-hide-mobile">70</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>3</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Zay Flowers</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">69</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Jayden Daniels</td>
+    <td>QB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">79</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Dak Prescott</td>
+    <td>QB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">87</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Luther Burden</td>
+    <td>WR</td>
+    <td>10</td>
+    <td class="col-hide-mobile">111</td>
+    <td class="col-hide-mobile">2</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Puka Nacua</td>
+    <td>WR</td>
+    <td>10</td>
+    <td class="col-hide-mobile">117</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>2</td>
+    <td><strong>7</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Evan McPherson</td>
+    <td>K</td>
+    <td>16</td>
+    <td class="col-hide-mobile">186</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Seattle Seahawks</td>
+    <td>DEF</td>
+    <td>16</td>
+    <td class="col-hide-mobile">190</td>
+    <td class="col-hide-mobile">1</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Tre Tucker</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="skippo" data-eligible="true">
+    <td>skippo</td>
+    <td>Kimani Vidal</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Harold Fannin</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="skippo" data-eligible="false">
+    <td>skippo</td>
+    <td>Parker Washington</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="spencerrubin7" data-eligible="false">
+    <td>spencerrubin7</td>
+    <td>Josh Jacobs</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">12</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="spencerrubin7" data-eligible="false">
+    <td>spencerrubin7</td>
+    <td>Justin Jefferson</td>
+    <td>WR</td>
+    <td>1</td>
+    <td class="col-hide-mobile">7</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Alvin Kamara</td>
+    <td>RB</td>
+    <td>2</td>
+    <td class="col-hide-mobile">18</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Jonathan Taylor</td>
+    <td>RB</td>
+    <td>2</td>
+    <td class="col-hide-mobile">13</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Omarion Hampton</td>
+    <td>RB</td>
+    <td>3</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Aaron Jones</td>
+    <td>RB</td>
+    <td>4</td>
+    <td class="col-hide-mobile">43</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>DeVonta Smith</td>
+    <td>WR</td>
+    <td>4</td>
+    <td class="col-hide-mobile">41</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Baker Mayfield</td>
+    <td>QB</td>
+    <td>5</td>
+    <td class="col-hide-mobile">60</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Khalil Shakir</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">56</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Courtland Sutton</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">66</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Jameson Williams</td>
+    <td>WR</td>
+    <td>7</td>
+    <td class="col-hide-mobile">83</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Cameron Dicker</td>
+    <td>K</td>
+    <td>11</td>
+    <td class="col-hide-mobile">124</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Bo Nix</td>
+    <td>QB</td>
+    <td>12</td>
+    <td class="col-hide-mobile">142</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>Theo Johnson</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr class="ineligible" data-team="spencerrubin7" data-eligible="false">
+    <td>spencerrubin7</td>
+    <td>Brenton Strange</td>
+    <td>TE</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
+    <td>spencerrubin7</td>
+    <td>New Orleans Saints</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">2</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="zachjd5" data-eligible="false">
+    <td>zachjd5</td>
+    <td>Ashton Jeanty</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">10</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="zachjd5" data-eligible="false">
+    <td>zachjd5</td>
+    <td>Derrick Henry</td>
+    <td>RB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">6</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr class="ineligible" data-team="zachjd5" data-eligible="false">
+    <td>zachjd5</td>
+    <td>Josh Allen</td>
+    <td>QB</td>
+    <td>1</td>
+    <td class="col-hide-mobile">11</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Tee Higgins</td>
+    <td>WR</td>
+    <td>2</td>
+    <td class="col-hide-mobile">15</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Malik Nabers</td>
+    <td>WR</td>
+    <td>3</td>
+    <td class="col-hide-mobile">34</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>1</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Chris Olave</td>
+    <td>WR</td>
+    <td>5</td>
+    <td class="col-hide-mobile">52</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Stefon Diggs</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">62</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Brian Thomas</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">106</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Jayden Higgins</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">100</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>8</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Colston Loveland</td>
+    <td>TE</td>
+    <td>10</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Bhayshul Tuten</td>
+    <td>RB</td>
+    <td>11</td>
+    <td class="col-hide-mobile">130</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>San Francisco 49ers</td>
+    <td>DEF</td>
+    <td>14</td>
+    <td class="col-hide-mobile">162</td>
+    <td class="col-hide-mobile">1</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Kyle Monangai</td>
+    <td>RB</td>
+    <td>15</td>
+    <td class="col-hide-mobile">178</td>
+    <td class="col-hide-mobile">15</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Blake Corum</td>
+    <td>RB</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">5</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Cairo Santos</td>
+    <td>K</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">0</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Alec Pierce</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">15</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
+    <td>zachjd5</td>
+    <td>Kansas City Chiefs</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="zachmassey" data-eligible="false">
+    <td>zachmassey</td>
+    <td>Mike Evans</td>
+    <td>WR</td>
+    <td>2</td>
+    <td class="col-hide-mobile">19</td>
+    <td class="col-hide-mobile">5</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Travis Kelce</td>
+    <td>TE</td>
+    <td>3</td>
+    <td class="col-hide-mobile">33</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Joe Burrow</td>
+    <td>QB</td>
+    <td>3</td>
+    <td class="col-hide-mobile">30</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>2</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Joe Mixon</td>
+    <td>RB</td>
+    <td>4</td>
+    <td class="col-hide-mobile">46</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Tony Pollard</td>
+    <td>RB</td>
+    <td>4</td>
+    <td class="col-hide-mobile">39</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>3</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>RJ Harvey</td>
+    <td>RB</td>
+    <td>5</td>
+    <td class="col-hide-mobile">R</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>4</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Chris Godwin</td>
+    <td>WR</td>
+    <td>6</td>
+    <td class="col-hide-mobile">67</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>5</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Travis Etienne</td>
+    <td>RB</td>
+    <td>7</td>
+    <td class="col-hide-mobile">78</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>6</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Nick Chubb</td>
+    <td>RB</td>
+    <td>8</td>
+    <td class="col-hide-mobile">91</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Ricky Pearsall</td>
+    <td>WR</td>
+    <td>9</td>
+    <td class="col-hide-mobile">102</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>7</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Jerry Jeudy</td>
+    <td>WR</td>
+    <td>11</td>
+    <td class="col-hide-mobile">126</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>1</td>
+    <td><strong>9</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Pittsburgh Steelers</td>
+    <td>DEF</td>
+    <td>13</td>
+    <td class="col-hide-mobile">150</td>
+    <td class="col-hide-mobile">9</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>10</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Darren Waller</td>
+    <td>TE</td>
+    <td>16</td>
+    <td class="col-hide-mobile">187</td>
+    <td class="col-hide-mobile">NO CLAIMS</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>12</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Michael Wilson</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">2</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="zachmassey" data-eligible="false">
+    <td>zachmassey</td>
+    <td>Eddy Pineiro</td>
+    <td>K</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">3</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
+    <td>zachmassey</td>
+    <td>Darius Slayton</td>
+    <td>WR</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">5</td>
+    <td>True</td>
+    <td>0</td>
+    <td><strong>11</strong></td>
+</tr><tr class="ineligible" data-team="zachmassey" data-eligible="false">
+    <td>zachmassey</td>
+    <td>Detroit Lions</td>
+    <td>DEF</td>
+    <td>UNDRAFTED</td>
+    <td class="col-hide-mobile">UNDRAFTED</td>
+    <td class="col-hide-mobile">2</td>
+    <td>False</td>
+    <td>0</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+</tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function() {
+    const table = document.getElementById("keeper-table");
+    const tbody = table.querySelector("tbody");
+    const teamFilter = document.getElementById("team-filter");
+    const eligibleToggle = document.getElementById("eligible-toggle");
+    const posFilter = document.getElementById("pos-filter");
+
+    function applyTeamStyles() {
+        const visible = Array.from(tbody.querySelectorAll("tr")).filter(r => r.style.display !== "none");
+        let prevTeam = null, teamIdx = 0;
+        visible.forEach(function(row, i) {
+            row.classList.remove("team-shade", "team-border");
+            const t = row.dataset.team;
+            if (t !== prevTeam) { prevTeam = t; teamIdx++; }
+            if (teamIdx % 2 === 1) row.classList.add("team-shade");
+            // Add border on last row of each team group
+            const nextRow = visible[i + 1];
+            if (!nextRow || nextRow.dataset.team !== t) row.classList.add("team-border");
+        });
+    }
+
+    function applyFilters() {
+        const team = teamFilter.value;
+        const eligOnly = eligibleToggle.checked;
+        const pos = posFilter.value;
+        tbody.querySelectorAll("tr").forEach(function(row) {
+            let show = true;
+            if (team && row.dataset.team !== team) show = false;
+            if (eligOnly && row.dataset.eligible !== "true") show = false;
+            if (pos && row.children[2].textContent !== pos) show = false;
+            row.style.display = show ? "" : "none";
+        });
+        applyTeamStyles();
+    }
+    teamFilter.addEventListener("change", applyFilters);
+    eligibleToggle.addEventListener("change", applyFilters);
+    posFilter.addEventListener("change", applyFilters);
+
+    // Sortable columns
+    let sortCol = -1, sortAsc = true;
+    table.querySelectorAll("thead th").forEach(function(th) {
+        th.addEventListener("click", function() {
+            const col = parseInt(th.dataset.col);
+            if (sortCol === col) { sortAsc = !sortAsc; }
+            else { sortCol = col; sortAsc = true; }
+
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            rows.sort(function(a, b) {
+                let va = a.children[col].textContent.trim();
+                let vb = b.children[col].textContent.trim();
+                // Numeric sort
+                const na = parseFloat(va), nb = parseFloat(vb);
+                if (!isNaN(na) && !isNaN(nb)) {
+                    return sortAsc ? na - nb : nb - na;
+                }
+                // Push non-numeric (UNDRAFTED, NOT ELIGIBLE, NO CLAIMS) to bottom
+                if (isNaN(na) && !isNaN(nb)) return 1;
+                if (!isNaN(na) && isNaN(nb)) return -1;
+                return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            });
+            rows.forEach(function(r) { tbody.appendChild(r); });
+
+            // Update arrows
+            table.querySelectorAll(".sort-arrow").forEach(function(s) { s.textContent = ""; });
+            th.querySelector(".sort-arrow").textContent = sortAsc ? " \u25B2" : " \u25BC";
+            applyTeamStyles();
+        });
+    });
+
+    // Initial styling
+    applyTeamStyles();
+})();
+</script>
+</body></html>

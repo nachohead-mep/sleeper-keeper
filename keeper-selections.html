@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Keeper Selections 2026">
+    <meta property="og:description" content="Submit your keeper picks">
+    <meta property="og:image" content="https://nachohead-mep.github.io/nfl-fantasy/images/og-default.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Keeper Selections 2026">
+    <meta name="twitter:description" content="Submit your keeper picks">
+    <meta name="twitter:image" content="https://nachohead-mep.github.io/nfl-fantasy/images/og-default.png">
+    <title>Keeper Selections 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="site-nav">
+    <a class="site-nav-home" href="index.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="24" height="24">
+  <defs>
+    <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4742F"/>
+      <stop offset="40%" stop-color="#A0522D"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <linearGradient id="deltaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Clip: only show football inside the delta's inner triangle (the hole) -->
+    <clipPath id="deltaHole">
+      <path d="M100,72 L60,148 L140,148 Z"/>
+    </clipPath>
+    <clipPath id="exitTopLeft">
+      <!-- Area below the delta's inner bottom edge only (bottom-left exit) -->
+      <polygon points="0,148 60,148 0,200"/>
+    </clipPath>
+    <clipPath id="exitBottomRight">
+      <!-- Area below and to the right of the delta's inner triangle -->
+      <polygon points="200,0 100,72 140,148 200,200 200,0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full delta drawn as one solid piece (back layer) -->
+  <g filter="url(#shadow)">
+    <!-- Outer triangle -->
+    <path d="M100,25 L40,160 L160,160 Z" fill="url(#deltaGrad)"/>
+    <!-- Inner cutout (matches background) -->
+    <path d="M100,72 L60,148 L140,148 Z" fill="#1a1d24"/>
+  </g>
+
+  <!-- Football - clipped to only show through the delta's hole -->
+  <g clip-path="url(#deltaHole)">
+    <g transform="translate(100, 112) rotate(-35)" filter="url(#shadow)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-left (in front of delta) -->
+  <g clip-path="url(#exitTopLeft)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-right (in front of delta) -->
+  <g clip-path="url(#exitBottomRight)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Motion lines -->
+  <g opacity="0.3" stroke="#60a5fa" stroke-width="2" stroke-linecap="round">
+    <line x1="155" y1="78" x2="175" y2="65"/>
+    <line x1="158" y1="88" x2="182" y2="79"/>
+    <line x1="156" y1="98" x2="178" y2="93"/>
+  </g>
+</svg>
+ Delta League</a>
+</nav>
+<div class="container-narrow">
+    <div class="page-header">
+        <div class="page-header-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="64" height="64">
+  <defs>
+    <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4742F"/>
+      <stop offset="40%" stop-color="#A0522D"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <linearGradient id="deltaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Clip: only show football inside the delta's inner triangle (the hole) -->
+    <clipPath id="deltaHole">
+      <path d="M100,72 L60,148 L140,148 Z"/>
+    </clipPath>
+    <clipPath id="exitTopLeft">
+      <!-- Area below the delta's inner bottom edge only (bottom-left exit) -->
+      <polygon points="0,148 60,148 0,200"/>
+    </clipPath>
+    <clipPath id="exitBottomRight">
+      <!-- Area below and to the right of the delta's inner triangle -->
+      <polygon points="200,0 100,72 140,148 200,200 200,0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full delta drawn as one solid piece (back layer) -->
+  <g filter="url(#shadow)">
+    <!-- Outer triangle -->
+    <path d="M100,25 L40,160 L160,160 Z" fill="url(#deltaGrad)"/>
+    <!-- Inner cutout (matches background) -->
+    <path d="M100,72 L60,148 L140,148 Z" fill="#1a1d24"/>
+  </g>
+
+  <!-- Football - clipped to only show through the delta's hole -->
+  <g clip-path="url(#deltaHole)">
+    <g transform="translate(100, 112) rotate(-35)" filter="url(#shadow)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-left (in front of delta) -->
+  <g clip-path="url(#exitTopLeft)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-right (in front of delta) -->
+  <g clip-path="url(#exitBottomRight)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Motion lines -->
+  <g opacity="0.3" stroke="#60a5fa" stroke-width="2" stroke-linecap="round">
+    <line x1="155" y1="78" x2="175" y2="65"/>
+    <line x1="158" y1="88" x2="182" y2="79"/>
+    <line x1="156" y1="98" x2="178" y2="93"/>
+  </g>
+</svg>
+</div>
+        <h1>Keeper Selections 2026</h1>
+        <p class="subtitle">Select up to 3 keepers for your team</p>
+        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
+    </div>
+
+    <div class="section-card">
+        <div class="form-group">
+            <label for="team-select">Your Team</label>
+            <select id="team-select"><option value="">Select your team...</option></select>
+        </div>
+        <div id="keeper-form" style="display:none">
+            <div class="form-group">
+                <label for="k1">Keeper 1</label>
+                <select id="k1"><option value="">-- none --</option></select>
+            </div>
+            <div class="form-group">
+                <label for="k2">Keeper 2</label>
+                <select id="k2"><option value="">-- none --</option></select>
+            </div>
+            <div class="form-group">
+                <label for="k3">Keeper 3</label>
+                <select id="k3"><option value="">-- none --</option></select>
+            </div>
+            <button class="btn" id="save-btn">Save Keepers</button>
+            <span id="save-status" style="margin-left:12px; font-size:0.85rem;"></span>
+        </div>
+    </div>
+
+    <div id="all-selections" class="section-card" style="display:none">
+        <h2>Current Selections</h2>
+        <div id="selections-list"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const API = "https://script.google.com/macros/s/AKfycbx2qVlCiJXTVzBkksauGabXjXaxuPM0AE1-6-CFn36XcL6vG6JkOSf_uU_dXNlgjoDaeQ/exec";
+    const eligibleByTeam = {"DannyN": [{"name": "DJ Moore", "pos": "WR", "round": "3"}, {"name": "Jaxon Smith-Njigba", "pos": "WR", "round": "3"}, {"name": "Mark Andrews", "pos": "TE", "round": "5"}, {"name": "Chase Brown", "pos": "RB", "round": "6"}, {"name": "Trey Benson", "pos": "RB", "round": "9"}, {"name": "Kyle Pitts", "pos": "TE", "round": "9"}, {"name": "Chase McLaughlin", "pos": "K", "round": "12"}, {"name": "Oronde Gadsden", "pos": "TE", "round": "12"}, {"name": "Jaxson Dart", "pos": "QB", "round": "10"}, {"name": "Chimere Dike", "pos": "WR", "round": "11"}, {"name": "Jacoby Brissett", "pos": "QB", "round": "11"}, {"name": "Greg Dortch", "pos": "WR", "round": "11"}, {"name": "Ty Johnson", "pos": "RB", "round": "10"}, {"name": "Devin Singletary", "pos": "RB", "round": "11"}, {"name": "Kenneth Gainwell", "pos": "RB", "round": "11"}, {"name": "Green Bay Packers", "pos": "DEF", "round": "12"}], "Friedo": [{"name": "Lamar Jackson", "pos": "QB", "round": "1"}, {"name": "Drake London", "pos": "WR", "round": "2"}, {"name": "George Pickens", "pos": "WR", "round": "2"}, {"name": "Deebo Samuel", "pos": "WR", "round": "4"}, {"name": "Brian Robinson", "pos": "RB", "round": "6"}, {"name": "Emeka Egbuka", "pos": "WR", "round": "8"}, {"name": "Trey McBride", "pos": "TE", "round": "7"}, {"name": "Bucky Irving", "pos": "RB", "round": "10"}, {"name": "Houston Texans", "pos": "DEF", "round": "11"}, {"name": "Rico Dowdle", "pos": "RB", "round": "11"}, {"name": "Los Angeles Rams", "pos": "DEF", "round": "11"}, {"name": "Emanuel Wilson", "pos": "RB", "round": "8"}], "Gohrdo": [{"name": "DK Metcalf", "pos": "WR", "round": "1"}, {"name": "Terry McLaurin", "pos": "WR", "round": "1"}, {"name": "Jaylen Waddle", "pos": "WR", "round": "3"}, {"name": "Cooper Kupp", "pos": "WR", "round": "4"}, {"name": "De'Von Achane", "pos": "RB", "round": "3"}, {"name": "Rhamondre Stevenson", "pos": "RB", "round": "7"}, {"name": "Justin Herbert", "pos": "QB", "round": "8"}, {"name": "Quinshon Judkins", "pos": "RB", "round": "9"}, {"name": "Jake Ferguson", "pos": "TE", "round": "11"}, {"name": "Hunter Henry", "pos": "TE", "round": "10"}, {"name": "Jason Myers", "pos": "K", "round": "12"}, {"name": "Daniel Jones", "pos": "QB", "round": "12"}, {"name": "John Metchie", "pos": "WR", "round": "8"}, {"name": "Christian Watson", "pos": "WR", "round": "12"}, {"name": "Cleveland Browns", "pos": "DEF", "round": "11"}], "JoshWasserman": [{"name": "Kenneth Walker", "pos": "RB", "round": "1"}, {"name": "TreVeyon Henderson", "pos": "RB", "round": "4"}, {"name": "Jayden Reed", "pos": "WR", "round": "10"}, {"name": "Matthew Golden", "pos": "WR", "round": "8"}, {"name": "Tyler Warren", "pos": "TE", "round": "8"}, {"name": "Jacory Croskey-Merritt", "pos": "RB", "round": "12"}, {"name": "Denver Broncos", "pos": "DEF", "round": "12"}, {"name": "Tyler Allgeier", "pos": "RB", "round": "12"}, {"name": "Kayshon Boutte", "pos": "WR", "round": "9"}, {"name": "Quentin Johnston", "pos": "WR", "round": "10"}], "ashanes": [{"name": "Breece Hall", "pos": "RB", "round": "2"}, {"name": "Ladd McConkey", "pos": "WR", "round": "6"}, {"name": "Javonte Williams", "pos": "RB", "round": "7"}, {"name": "Michael Pittman", "pos": "WR", "round": "8"}, {"name": "Rashee Rice", "pos": "WR", "round": "7"}, {"name": "Brandon Aubrey", "pos": "K", "round": "10"}, {"name": "Keenan Allen", "pos": "WR", "round": "11"}, {"name": "Caleb Williams", "pos": "QB", "round": "12"}, {"name": "Dallas Goedert", "pos": "TE", "round": "12"}, {"name": "Troy Franklin", "pos": "WR", "round": "10"}, {"name": "Juwan Johnson", "pos": "TE", "round": "11"}, {"name": "Zonovan Knight", "pos": "RB", "round": "12"}], "dbleykhman": [{"name": "A.J. Brown", "pos": "WR", "round": "1"}, {"name": "D'Andre Swift", "pos": "RB", "round": "2"}, {"name": "Garrett Wilson", "pos": "WR", "round": "1"}, {"name": "Kyren Williams", "pos": "RB", "round": "4"}, {"name": "Jaylen Warren", "pos": "RB", "round": "6"}, {"name": "Drake Maye", "pos": "QB", "round": "9"}, {"name": "Nico Collins", "pos": "WR", "round": "7"}, {"name": "Dalton Kincaid", "pos": "TE", "round": "10"}, {"name": "Tyrone Tracy", "pos": "RB", "round": "5"}, {"name": "Ka'imi Fairbairn", "pos": "K", "round": "12"}, {"name": "Dalton Schultz", "pos": "TE", "round": "12"}, {"name": "Wan'Dale Robinson", "pos": "WR", "round": "6"}, {"name": "Buffalo Bills", "pos": "DEF", "round": "12"}, {"name": "New England Patriots", "pos": "DEF", "round": "11"}], "jaw7475": [{"name": "Rome Odunze", "pos": "WR", "round": "4"}, {"name": "Tetairoa McMillan", "pos": "WR", "round": "5"}, {"name": "Jordan Mason", "pos": "RB", "round": "11"}, {"name": "Brock Bowers", "pos": "TE", "round": "5"}, {"name": "Cam Skattebo", "pos": "RB", "round": "6"}, {"name": "Zach Charbonnet", "pos": "RB", "round": "7"}, {"name": "Jauan Jennings", "pos": "WR", "round": "11"}, {"name": "Tucker Kraft", "pos": "TE", "round": "11"}, {"name": "Ollie Gordon", "pos": "RB", "round": "11"}, {"name": "Woody Marks", "pos": "RB", "round": "12"}, {"name": "Chris Rodriguez", "pos": "RB", "round": "11"}, {"name": "Matthew Stafford", "pos": "QB", "round": "9"}], "jpersily": [{"name": "David Montgomery", "pos": "RB", "round": "2"}, {"name": "Patrick Mahomes", "pos": "QB", "round": "3"}, {"name": "T.J. Hockenson", "pos": "TE", "round": "3"}, {"name": "Jakobi Meyers", "pos": "WR", "round": "4"}, {"name": "Evan Engram", "pos": "TE", "round": "11"}, {"name": "Brandon Aiyuk", "pos": "WR", "round": "6"}, {"name": "Keon Coleman", "pos": "WR", "round": "7"}, {"name": "Jared Goff", "pos": "QB", "round": "6"}, {"name": "Chuba Hubbard", "pos": "RB", "round": "6"}, {"name": "Tyjae Spears", "pos": "RB", "round": "11"}, {"name": "Harrison Butker", "pos": "K", "round": "11"}, {"name": "Rashid Shaheed", "pos": "WR", "round": "11"}, {"name": "Philadelphia Eagles", "pos": "DEF", "round": "12"}, {"name": "Trevor Lawrence", "pos": "QB", "round": "12"}, {"name": "Tez Johnson", "pos": "WR", "round": "10"}, {"name": "Romeo Doubs", "pos": "WR", "round": "10"}, {"name": "Jacksonville Jaguars", "pos": "DEF", "round": "11"}], "skippo": [{"name": "Marvin Harrison", "pos": "WR", "round": "1"}, {"name": "George Kittle", "pos": "TE", "round": "1"}, {"name": "Davante Adams", "pos": "WR", "round": "2"}, {"name": "Zay Flowers", "pos": "WR", "round": "3"}, {"name": "Jayden Daniels", "pos": "QB", "round": "5"}, {"name": "Dak Prescott", "pos": "QB", "round": "7"}, {"name": "Luther Burden", "pos": "WR", "round": "11"}, {"name": "Puka Nacua", "pos": "WR", "round": "7"}, {"name": "Seattle Seahawks", "pos": "DEF", "round": "11"}, {"name": "Kimani Vidal", "pos": "RB", "round": "12"}], "spencerrubin7": [{"name": "Alvin Kamara", "pos": "RB", "round": "1"}, {"name": "Jonathan Taylor", "pos": "RB", "round": "1"}, {"name": "Omarion Hampton", "pos": "RB", "round": "2"}, {"name": "Aaron Jones", "pos": "RB", "round": "3"}, {"name": "DeVonta Smith", "pos": "WR", "round": "3"}, {"name": "Baker Mayfield", "pos": "QB", "round": "4"}, {"name": "Khalil Shakir", "pos": "WR", "round": "4"}, {"name": "Courtland Sutton", "pos": "WR", "round": "4"}, {"name": "Jameson Williams", "pos": "WR", "round": "5"}, {"name": "Cameron Dicker", "pos": "K", "round": "10"}, {"name": "Bo Nix", "pos": "QB", "round": "10"}, {"name": "Theo Johnson", "pos": "TE", "round": "12"}, {"name": "New Orleans Saints", "pos": "DEF", "round": "11"}], "zachjd5": [{"name": "Tee Higgins", "pos": "WR", "round": "1"}, {"name": "Malik Nabers", "pos": "WR", "round": "1"}, {"name": "Chris Olave", "pos": "WR", "round": "4"}, {"name": "Stefon Diggs", "pos": "WR", "round": "5"}, {"name": "Brian Thomas", "pos": "WR", "round": "7"}, {"name": "Jayden Higgins", "pos": "WR", "round": "8"}, {"name": "Colston Loveland", "pos": "TE", "round": "9"}, {"name": "Bhayshul Tuten", "pos": "RB", "round": "10"}, {"name": "San Francisco 49ers", "pos": "DEF", "round": "11"}, {"name": "Kyle Monangai", "pos": "RB", "round": "9"}, {"name": "Blake Corum", "pos": "RB", "round": "11"}, {"name": "Cairo Santos", "pos": "K", "round": "12"}, {"name": "Alec Pierce", "pos": "WR", "round": "9"}, {"name": "Kansas City Chiefs", "pos": "DEF", "round": "11"}], "zachmassey": [{"name": "Travis Kelce", "pos": "TE", "round": "2"}, {"name": "Joe Burrow", "pos": "QB", "round": "2"}, {"name": "Joe Mixon", "pos": "RB", "round": "3"}, {"name": "Tony Pollard", "pos": "RB", "round": "3"}, {"name": "RJ Harvey", "pos": "RB", "round": "4"}, {"name": "Chris Godwin", "pos": "WR", "round": "5"}, {"name": "Travis Etienne", "pos": "RB", "round": "6"}, {"name": "Nick Chubb", "pos": "RB", "round": "7"}, {"name": "Ricky Pearsall", "pos": "WR", "round": "7"}, {"name": "Jerry Jeudy", "pos": "WR", "round": "9"}, {"name": "Pittsburgh Steelers", "pos": "DEF", "round": "10"}, {"name": "Darren Waller", "pos": "TE", "round": "12"}, {"name": "Michael Wilson", "pos": "WR", "round": "11"}, {"name": "Darius Slayton", "pos": "WR", "round": "11"}]};
+    const teams = ["DannyN", "Friedo", "Gohrdo", "JoshWasserman", "ashanes", "dbleykhman", "jaw7475", "jpersily", "skippo", "spencerrubin7", "zachjd5", "zachmassey"];
+    const teamSelect = document.getElementById("team-select");
+    const keeperForm = document.getElementById("keeper-form");
+    const saveBtn = document.getElementById("save-btn");
+    const saveStatus = document.getElementById("save-status");
+
+    teams.forEach(function(t) {
+        const opt = document.createElement("option");
+        opt.value = t; opt.textContent = t;
+        teamSelect.appendChild(opt);
+    });
+
+    function populateDropdowns(team) {
+        const players = eligibleByTeam[team] || [];
+        ["k1","k2","k3"].forEach(function(id) {
+            const sel = document.getElementById(id);
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">-- none --</option>';
+            players.forEach(function(p) {
+                const opt = document.createElement("option");
+                opt.value = p.name;
+                opt.textContent = p.name + " (" + p.pos + ", Rd " + p.round + ")";
+                sel.appendChild(opt);
+            });
+            sel.value = cur;
+        });
+    }
+
+    teamSelect.addEventListener("change", function() {
+        const team = teamSelect.value;
+        if (!team) { keeperForm.style.display = "none"; return; }
+        keeperForm.style.display = "";
+        populateDropdowns(team);
+        // Load current selections from Apps Script
+        if (API) {
+            fetch(API).then(r => r.json()).then(function(data) {
+                const sel = (data.selections || []).find(s => s.team === team);
+                if (sel) {
+                    document.getElementById("k1").value = sel.keeper_1 || "";
+                    document.getElementById("k2").value = sel.keeper_2 || "";
+                    document.getElementById("k3").value = sel.keeper_3 || "";
+                }
+            }).catch(function() {});
+        }
+    });
+
+    saveBtn.addEventListener("click", function() {
+        const team = teamSelect.value;
+        if (!team || !API) return;
+        saveBtn.disabled = true;
+        saveStatus.textContent = "Saving...";
+        const payload = {
+            manager: team,
+            keeper1: document.getElementById("k1").value,
+            keeper2: document.getElementById("k2").value,
+            keeper3: document.getElementById("k3").value
+        };
+        fetch(API, {
+            method: "POST",
+            headers: {"Content-Type": "text/plain"},
+            body: JSON.stringify(payload),
+            mode: "no-cors"
+        }).then(function() {
+            saveStatus.textContent = "\u2705 Saved!";
+            saveBtn.disabled = false;
+        }).catch(function() {
+            saveStatus.textContent = "\u274C Error saving";
+            saveBtn.disabled = false;
+        });
+    });
+
+    // Load all current selections
+    if (API) {
+        fetch(API).then(r => r.json()).then(function(data) {
+            const container = document.getElementById("selections-list");
+            const sec = document.getElementById("all-selections");
+            if (!data.selections || data.selections.length === 0) return;
+            sec.style.display = "";
+            let html = "";
+            data.selections.forEach(function(s) {
+                const keepers = [s.keeper_1, s.keeper_2, s.keeper_3].filter(Boolean);
+                html += '<div class="current-selections" style="margin-bottom:8px">';
+                html += '<h3>' + s.team + '</h3>';
+                if (keepers.length === 0) {
+                    html += '<div class="sel-empty">No selections yet</div>';
+                } else {
+                    keepers.forEach(function(k) {
+                        html += '<div class="sel-item">\u2022 ' + k + '</div>';
+                    });
+                }
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }).catch(function() {});
+    }
+})();
+</script>
+</body></html>
