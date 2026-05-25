@@ -11,4 +11,7 @@ dependencies = [
     "Pillow==11.2.1",
     "cairosvg>=2.9.0",
     "python-dotenv>=1.2.2",
+    "beautifulsoup4==4.13.4",
+    "selenium==4.36.0",
+    "lxml==6.0.2",
 ]
