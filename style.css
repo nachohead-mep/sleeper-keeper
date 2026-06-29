@@ -286,7 +286,7 @@ body.wc-theme .section-card {
 .seed-controls #seed.locked { opacity: 0.6; cursor: not-allowed; }
 
 .official-banner {
-    display: none; align-items: center; gap: 8px; margin-bottom: 12px;
+    display: none; flex-direction: column; align-items: flex-start; gap: 7px; margin-bottom: 12px;
     padding: 10px 14px; border-radius: var(--radius-sm);
     background: rgba(16, 185, 129, 0.10); border: 1px solid rgba(16, 185, 129, 0.4);
     color: var(--accent-green); font-size: 0.85rem; font-weight: 600; line-height: 1.4;
@@ -296,6 +296,16 @@ body.wc-theme .section-card {
     font-family: ui-monospace, Menlo, monospace; color: var(--text-primary);
     background: rgba(0, 0, 0, 0.25); padding: 1px 6px; border-radius: 4px;
 }
+.practice-link { color: var(--wc-gold); font-size: 0.8rem; font-weight: 600; text-decoration: none; }
+.practice-link:hover { text-decoration: underline; }
+
+.practice-banner {
+    display: none; align-items: center; gap: 8px; margin-bottom: 12px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: rgba(59, 130, 246, 0.10); border: 1px solid rgba(59, 130, 246, 0.4);
+    color: var(--accent-blue); font-size: 0.85rem; font-weight: 500; line-height: 1.4;
+}
+.practice-banner.show { display: flex; }
 .seed-controls .toggle-label {
     display: flex; align-items: center; gap: 6px; white-space: nowrap;
     color: var(--text-secondary); font-size: 0.8rem; cursor: pointer;
