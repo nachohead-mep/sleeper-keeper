@@ -584,3 +584,66 @@ body.wc-theme .section-card {
     .data-table th, .data-table td { padding: 4px 6px; font-size: 0.7rem; }
     .form-group select, .form-group input, .form-group textarea { font-size: 16px; }
 }
+
+/* ── Rookie lottery: mobile optimisation ──────────────────── */
+@media (max-width: 600px) {
+    body { overflow-x: hidden; } /* belt-and-braces against stray horizontal scroll */
+    .container-narrow, .section-card { overflow-x: clip; } /* keep children within bounds */
+    /* Seed controls: full-width field, full-width button */
+    .seed-controls { gap: 8px; }
+    .seed-controls #seed { flex: 1 1 100%; min-width: 0; font-size: 16px; } /* 16px avoids iOS zoom */
+    .seed-controls .btn { flex: 1 1 100%; }
+    .collapse-btn { width: 100%; justify-content: center; }
+    .permalink-box { gap: 6px; }
+    .permalink-url { min-width: 0; font-size: 0.68rem; flex: 1 1 100%; }
+    .official-banner { font-size: 0.8rem; }
+
+    /* Draw ball + number */
+    .draw-ball { gap: 12px; }
+    .draw-ball-icon { font-size: 2.8rem; }
+    .roll-num { font-size: 2.6rem; min-width: 1.8ch; }
+    .roll-status { font-size: 0.85rem; }
+
+    /* The pot: tighter bands, drop the sub-label, smaller flags */
+    .odds-bar { height: 56px; }
+    .odds-seg .seg-name { font-size: 0.56rem; gap: 2px; padding: 0 2px; }
+    .odds-seg .seg-pct { display: none; }
+    .flag { height: 11px; }
+
+    /* Penalty shootout: the flying-ball lane doesn't fit a phone, so drop it and
+       show a clean name + colour-coded commentary stack (colour = the outcome). */
+    .pitch { padding: 12px 10px 8px; }
+    .goal-banner { font-size: 0.62rem; letter-spacing: 0.03em; }
+    .kicker { flex-wrap: wrap; row-gap: 2px; padding: 8px 10px; gap: 4px; }
+    .kicker .lane, .kicker .keeper, .kicker .net { display: none; }
+    .kicker-name { flex: 1 1 100%; width: 100%; max-width: 100%; font-size: 0.84rem; }
+    .kicker-result { flex: 1 1 100%; width: 100%; text-align: left; font-size: 0.76rem; }
+    .avatar.av-md { width: 26px; height: 26px; }
+
+    /* Lottery board: wrapping grid (auto-flow column can leak width on phones) */
+    .board {
+        gap: 5px; margin-top: 14px;
+        grid-auto-flow: row; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+        grid-auto-columns: auto; max-width: 100%;
+    }
+    .pitch, .kicker, .order-row, .section-card { max-width: 100%; }
+    .board-slot { padding: 8px 3px; }
+    .board-slot .slot-pick { font-size: 0.62rem; }
+    .board-slot .slot-team { font-size: 0.7rem; gap: 3px; }
+    .board-slot .slot-roll { display: none; } /* save vertical space on tiny screens */
+
+    /* Full draft order: let long/traded rows wrap instead of clipping */
+    .order-list { gap: 5px; }
+    .order-row { padding: 8px 10px; }
+    .order-team { white-space: normal; gap: 5px; }
+    .order-team.is-traded { flex-wrap: wrap; }
+    .trade-from { font-size: 0.7rem; }
+    .order-pick { width: 22px; height: 22px; font-size: 0.72rem; }
+
+    /* Verify-odds table scrolls horizontally instead of squishing */
+    .sim-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+
+    /* Bigger tap target for headshots */
+    .avatar { cursor: pointer; }
+    .lightbox img { max-width: 92vw; }
+}
