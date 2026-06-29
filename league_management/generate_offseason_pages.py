@@ -13,6 +13,7 @@ Reads keeper data from Google Sheets at build time and generates:
 
 import argparse
 import os
+import sys
 import shutil
 import datetime
 from pathlib import Path
@@ -227,7 +228,12 @@ def generate_landing(year, sheet_id):
         <a class="landing-card" href="rookie-lottery.html">
             <div class="card-icon">&#9917;</div>
             <h2>The Draw</h2>
-            <p>Provably-fair World Cup&ndash;style draw for picks 2&ndash;6. Run it live and verify the odds.</p>
+            <p>World Cup&ndash;style weighted lottery for picks 2&ndash;6. Run it live and verify the odds.</p>
+        </a>
+        <a class="landing-card" href="rookie-values.html">
+            <div class="card-icon">&#128202;</div>
+            <h2>Rookie Values</h2>
+            <p>Incoming rookie class &mdash; consensus ADP and the draft round each rookie is worth.</p>
         </a>
     </div>
 </div>
@@ -1385,6 +1391,191 @@ def generate_lottery(pick_rows, year, sheet_id):
 
 
 # ============================================================================
+# Rookie Values — FantasyPros rookie ADP + draft cost (from the rankings script)
+# ============================================================================
+def _rookie_values_df(year, teams=12, keeper_discount=6):
+    """Run the existing rankings scraper (FantasyPros, no Selenium) for rookie
+    values. Returns a DataFrame, or an empty one if the scrape fails — a flaky
+    scrape must never break the whole deploy.
+    """
+    import pandas as pd
+    draft_prep = os.path.normpath(os.path.join(script_dir, "..", "draft_prep"))
+    if draft_prep not in sys.path:
+        sys.path.insert(0, draft_prep)
+    try:
+        from rankings.config import build_config
+        from rankings.sources import fantasypros as fp
+        from rankings import combine
+
+        cfg = build_config(season=year, sources=("fpros",), rookies_only=True)
+        rookies = fp.fetch_rookies(cfg)
+        if rookies is None or rookies.empty:
+            return pd.DataFrame()
+        # ADP is often unpublished in the offseason — that's fine, the dynasty
+        # rookie ranking still stands. Fetch it independently.
+        try:
+            adp = fp.fetch_adp(cfg)
+        except Exception as exc:
+            print(f"  Rookie ADP unavailable ({type(exc).__name__}); showing ranking only.", file=sys.stderr)
+            adp = pd.DataFrame()
+        return combine.build_simple_rookies_view(
+            rookies, adp, teams=teams, keeper_discount_picks=keeper_discount,
+        )
+    except Exception as exc:  # network/DOM/season-not-published — degrade gracefully
+        print(f"  Rookie values scrape skipped: {type(exc).__name__}: {exc}", file=sys.stderr)
+        return pd.DataFrame()
+
+
+def generate_rookie_values(df, year, teams=12, keeper_discount=6):
+    import math
+
+    if df is None or df.empty:
+        body = """<div class="section-card"><p style="color:var(--text-muted)">
+        Rookie values aren't available yet &mdash; the rankings source hasn't published this
+        season's rookie class, or the scrape was unavailable at build time. Check back closer to the draft.</p></div>"""
+        return f"""{_head(f"Rookie Values {year}", "Incoming rookie ADP and draft cost")}
+<body>
+{_nav()}
+<div class="container-narrow">
+    <div class="page-header">
+        <div class="page-header-icon">{_logo_page_header()}</div>
+        <h1>Rookie Values {year}</h1>
+        <p class="subtitle">Incoming rookie class</p>
+    </div>
+    {body}
+</div>
+</body></html>"""
+
+    positions = [p for p in ["QB", "RB", "WR", "TE"] if p in set(df["position"])]
+    pos_options = "".join(f'<option value="{_escape(p)}">{_escape(p)}</option>' for p in positions)
+
+    has_adp = bool(df["adp_avg"].notna().any()) if "adp_avg" in df.columns else False
+
+    def _adp_cells(row):
+        if not has_adp:
+            return ""
+        adp = getattr(row, "adp_avg", None)
+        disc = getattr(row, "discounted_pick", None)
+        cost = getattr(row, "rookie_cost_round", None)
+        adp_txt = "&mdash;" if adp is None or (isinstance(adp, float) and math.isnan(adp)) else f"{adp:.1f}"
+        disc_txt = "&mdash;" if disc is None or (isinstance(disc, float) and math.isnan(disc)) else f"{disc:.0f}"
+        try:
+            cost_txt = "&mdash;" if cost is None or (isinstance(cost, float) and math.isnan(cost)) else f"Rd {int(cost)}"
+        except (ValueError, TypeError):
+            cost_txt = "&mdash;"
+        return (f'<td>{adp_txt}</td><td class="col-hide-mobile">{disc_txt}</td>'
+                f'<td><strong>{cost_txt}</strong></td>')
+
+    rows_html = ""
+    for i, row in enumerate(df.itertuples(index=False), start=1):
+        pos = _escape(getattr(row, "position", ""))
+        rows_html += (f'<tr data-pos="{pos}"><td>{i}</td>'
+                      f'<td>{_escape(getattr(row, "player_name", ""))}</td>'
+                      f'<td>{pos}</td><td>{_escape(getattr(row, "team", ""))}</td>'
+                      f'{_adp_cells(row)}</tr>\n')
+
+    adp_head = (
+        '<th data-col="4" data-num="1">ADP <span class="sort-arrow"></span></th>'
+        '<th data-col="5" data-num="1" class="col-hide-mobile">Disc. Pick <span class="sort-arrow"></span></th>'
+        '<th data-col="6" data-num="1">Rookie Rd <span class="sort-arrow"></span></th>'
+    ) if has_adp else ''
+    subtitle = (f"{len(df)} rookies &middot; consensus ADP from FantasyPros" if has_adp
+                else f"{len(df)} rookies &middot; dynasty rookie rankings (FantasyPros)")
+    intro = (
+        f'<strong>Rookie Rd</strong> is the round a rookie is worth in our draft &mdash; their ADP pushed back '
+        f'{keeper_discount} picks (keeper discount), then placed in a {teams}-team draft. Lower ADP = earlier pick.'
+        if has_adp else
+        'Ranked by dynasty rookie consensus &mdash; the order to target in the rookie draft. ADP and draft-cost '
+        'columns will fill in once redraft ADP is published closer to the season.'
+    )
+
+    return f"""{_head(f"Rookie Values {year}", "Incoming rookie ADP and draft cost")}
+<body>
+{_nav()}
+<div class="container">
+    <div class="page-header">
+        <div class="page-header-icon">{_logo_page_header()}</div>
+        <h1>Rookie Values {year}</h1>
+        <p class="subtitle">{subtitle}</p>
+    </div>
+
+    <div class="section-card" style="padding:14px 16px;">
+        <p style="color:var(--text-secondary); font-size:0.85rem; margin:0;">{intro}</p>
+    </div>
+
+    <div class="filter-bar">
+        <label for="pos-filter">Position:</label>
+        <select id="pos-filter"><option value="">All</option>{pos_options}</select>
+        <input id="name-filter" placeholder="Search player&hellip;"
+               style="background:var(--bg-primary); color:var(--text-primary); border:1px solid var(--border); border-radius:4px; padding:4px 8px; font-size:0.85rem;">
+    </div>
+
+    <table class="data-table" id="rookie-table">
+        <thead><tr>
+            <th data-col="0" data-num="1">#  <span class="sort-arrow"></span></th>
+            <th data-col="1">Player <span class="sort-arrow"></span></th>
+            <th data-col="2">Pos <span class="sort-arrow"></span></th>
+            <th data-col="3">Team <span class="sort-arrow"></span></th>
+            {adp_head}
+        </tr></thead>
+        <tbody>
+{rows_html}
+        </tbody>
+    </table>
+</div>
+
+<script>
+(function() {{
+    const table = document.getElementById("rookie-table");
+    const tbody = table.querySelector("tbody");
+    const posFilter = document.getElementById("pos-filter");
+    const nameFilter = document.getElementById("name-filter");
+
+    function applyFilters() {{
+        const pos = posFilter.value;
+        const q = nameFilter.value.trim().toLowerCase();
+        tbody.querySelectorAll("tr").forEach(function(row) {{
+            let show = true;
+            if (pos && row.dataset.pos !== pos) show = false;
+            if (q && !row.children[1].textContent.toLowerCase().includes(q)) show = false;
+            row.style.display = show ? "" : "none";
+        }});
+    }}
+    posFilter.addEventListener("change", applyFilters);
+    nameFilter.addEventListener("input", applyFilters);
+
+    let sortCol = -1, sortAsc = true;
+    table.querySelectorAll("thead th").forEach(function(th) {{
+        th.addEventListener("click", function() {{
+            const col = parseInt(th.dataset.col);
+            const num = th.dataset.num === "1";
+            if (sortCol === col) {{ sortAsc = !sortAsc; }} else {{ sortCol = col; sortAsc = true; }}
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+            rows.sort(function(a, b) {{
+                let va = a.children[col].textContent.trim();
+                let vb = b.children[col].textContent.trim();
+                if (num) {{
+                    const na = parseFloat(va.replace(/[^0-9.]/g, ""));
+                    const nb = parseFloat(vb.replace(/[^0-9.]/g, ""));
+                    const aa = isNaN(na), bb = isNaN(nb);
+                    if (aa && bb) return 0;
+                    if (aa) return 1;        // blanks/dashes to bottom
+                    if (bb) return -1;
+                    return sortAsc ? na - nb : nb - na;
+                }}
+                return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            }});
+            rows.forEach(function(r) {{ tbody.appendChild(r); }});
+            table.querySelectorAll(".sort-arrow").forEach(function(s) {{ s.textContent = ""; }});
+            th.querySelector(".sort-arrow").textContent = sortAsc ? " \\u25B2" : " \\u25BC";
+        }});
+    }});
+}})();
+</script>
+</body></html>"""
+
+
+# ============================================================================
 # Main
 # ============================================================================
 def generate_all_pages(keeper_df, pick_rows, year, sheet_id, output_dir):
@@ -1414,6 +1605,7 @@ def generate_all_pages(keeper_df, pick_rows, year, sheet_id, output_dir):
         "offseason-proposals.html": generate_proposals(year, sheet_id),
         "rookie-draft.html": generate_rookie_draft(pick_rows, year, sheet_id),
         "rookie-lottery.html": generate_lottery(pick_rows, year, sheet_id),
+        "rookie-values.html": generate_rookie_values(_rookie_values_df(year), year),
     }
 
     for filename, html in pages.items():
