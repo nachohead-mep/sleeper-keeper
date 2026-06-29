@@ -1220,7 +1220,8 @@ if (params.get("practice")) showPractice();
 if (params.get("seed")) {
   const s = params.get("seed");
   if (params.get("lock")) lockSeed(s); else $("seed").value = s;
-  if (params.get("run")) play(s, false); // opt-in only; shared links no longer auto-start
+  // Locked (shared) links never auto-start, even older links that still carry run=1.
+  if (params.get("run") && !params.get("lock")) play(s, false);
 }
 """
 
