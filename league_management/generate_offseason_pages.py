@@ -1409,22 +1409,47 @@ def _rookie_values_df(year, teams=12, keeper_discount=6):
     try:
         from rankings.config import build_config
         from rankings.sources import fantasypros as fp
-        from rankings import combine
 
         cfg = build_config(season=year, sources=("fpros",), rookies_only=True)
         rookies = fp.fetch_rookies(cfg)
         if rookies is None or rookies.empty:
             return pd.DataFrame()
-        # ADP is often unpublished in the offseason — that's fine, the dynasty
-        # rookie ranking still stands. Fetch it independently.
+        df = rookies[["player_id", "player_name", "position", "team", "rookie_ecr"]].copy()
+
+        # Draft-position signal for the value: redraft ADP if it's published, else
+        # the overall consensus ECR (the standard ADP proxy). ADP is usually missing
+        # in the offseason — overall ECR still gives a solid keeper-cost estimate.
         try:
             adp = fp.fetch_adp(cfg)
+            if adp is not None and not adp.empty:
+                df = df.merge(adp[["player_id", "adp_avg"]], on="player_id", how="left")
         except Exception as exc:
-            print(f"  Rookie ADP unavailable ({type(exc).__name__}); showing ranking only.", file=sys.stderr)
-            adp = pd.DataFrame()
-        return combine.build_simple_rookies_view(
-            rookies, adp, teams=teams, keeper_discount_picks=keeper_discount,
-        )
+            print(f"  Rookie ADP unavailable ({type(exc).__name__}); using overall ECR.", file=sys.stderr)
+        try:
+            ovr = fp.fetch_overall_rankings(cfg)
+            if ovr is not None and not ovr.empty:
+                df = df.merge(ovr[["player_id", "ovr_ecr"]], on="player_id", how="left")
+        except Exception as exc:
+            print(f"  Overall ECR unavailable ({type(exc).__name__}).", file=sys.stderr)
+
+        has_adp = "adp_avg" in df.columns and df["adp_avg"].notna().any()
+        if has_adp:
+            df["value_pick"] = df["adp_avg"].fillna(df["ovr_ecr"]) if "ovr_ecr" in df.columns else df["adp_avg"]
+            df["value_source"] = "ADP"
+        elif "ovr_ecr" in df.columns:
+            df["value_pick"] = df["ovr_ecr"]
+            df["value_source"] = "ECR"
+        else:
+            df["value_pick"] = pd.NA
+            df["value_source"] = ""
+
+        # Keeper cost = value pushed back by the keeper discount, placed into a round.
+        discounted = df["value_pick"] + keeper_discount
+        df["discounted_pick"] = discounted.round(0)
+        df["rookie_cost_round"] = ((discounted - 1) // teams + 1).astype("Int64")
+
+        df = df.sort_values("value_pick", na_position="last").drop(columns="player_id")
+        return df.reset_index(drop=True)
     except Exception as exc:  # network/DOM/season-not-published — degrade gracefully
         print(f"  Rookie values scrape skipped: {type(exc).__name__}: {exc}", file=sys.stderr)
         return pd.DataFrame()
@@ -1453,22 +1478,23 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
     positions = [p for p in ["QB", "RB", "WR", "TE"] if p in set(df["position"])]
     pos_options = "".join(f'<option value="{_escape(p)}">{_escape(p)}</option>' for p in positions)
 
-    has_adp = bool(df["adp_avg"].notna().any()) if "adp_avg" in df.columns else False
+    has_value = bool(df["value_pick"].notna().any()) if "value_pick" in df.columns else False
+    src = ""
+    if "value_source" in df.columns and df["value_source"].astype(bool).any():
+        src = df.loc[df["value_source"].astype(bool), "value_source"].iloc[0]
+    val_label = "ADP" if src == "ADP" else "Overall #"
 
-    def _adp_cells(row):
-        if not has_adp:
+    def _val_cells(row):
+        if not has_value:
             return ""
-        adp = getattr(row, "adp_avg", None)
-        disc = getattr(row, "discounted_pick", None)
+        vp = getattr(row, "value_pick", None)
         cost = getattr(row, "rookie_cost_round", None)
-        adp_txt = "&mdash;" if adp is None or (isinstance(adp, float) and math.isnan(adp)) else f"{adp:.1f}"
-        disc_txt = "&mdash;" if disc is None or (isinstance(disc, float) and math.isnan(disc)) else f"{disc:.0f}"
+        vp_txt = "&mdash;" if vp is None or (isinstance(vp, float) and math.isnan(vp)) else f"{vp:.0f}"
         try:
             cost_txt = "&mdash;" if cost is None or (isinstance(cost, float) and math.isnan(cost)) else f"Rd {int(cost)}"
         except (ValueError, TypeError):
             cost_txt = "&mdash;"
-        return (f'<td>{adp_txt}</td><td class="col-hide-mobile">{disc_txt}</td>'
-                f'<td><strong>{cost_txt}</strong></td>')
+        return f'<td>{vp_txt}</td><td><strong>{cost_txt}</strong></td>'
 
     rows_html = ""
     for i, row in enumerate(df.itertuples(index=False), start=1):
@@ -1476,21 +1502,23 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
         rows_html += (f'<tr data-pos="{pos}"><td>{i}</td>'
                       f'<td>{_escape(getattr(row, "player_name", ""))}</td>'
                       f'<td>{pos}</td><td>{_escape(getattr(row, "team", ""))}</td>'
-                      f'{_adp_cells(row)}</tr>\n')
+                      f'{_val_cells(row)}</tr>\n')
 
     adp_head = (
-        '<th data-col="4" data-num="1">ADP <span class="sort-arrow"></span></th>'
-        '<th data-col="5" data-num="1" class="col-hide-mobile">Disc. Pick <span class="sort-arrow"></span></th>'
-        '<th data-col="6" data-num="1">Rookie Rd <span class="sort-arrow"></span></th>'
-    ) if has_adp else ''
-    subtitle = (f"{len(df)} rookies &middot; consensus ADP from FantasyPros" if has_adp
-                else f"{len(df)} rookies &middot; dynasty rookie rankings (FantasyPros)")
+        f'<th data-col="4" data-num="1">{val_label} <span class="sort-arrow"></span></th>'
+        f'<th data-col="5" data-num="1">Keeper Rd <span class="sort-arrow"></span></th>'
+    ) if has_value else ''
+    src_word = "ADP" if src == "ADP" else "ECR"
+    subtitle = f"{len(df)} rookies &middot; keeper cost from FantasyPros {src_word}"
+    src_phrase = ("their redraft ADP" if src == "ADP"
+                  else "their overall consensus ranking (redraft ADP isn't published yet)")
     intro = (
-        f'<strong>Rookie Rd</strong> is the round a rookie is worth in our draft &mdash; their ADP pushed back '
-        f'{keeper_discount} picks (keeper discount), then placed in a {teams}-team draft. Lower ADP = earlier pick.'
-        if has_adp else
-        'Ranked by dynasty rookie consensus &mdash; the order to target in the rookie draft. ADP and draft-cost '
-        'columns will fill in once redraft ADP is published closer to the season.'
+        f"<strong>Keeper Rd</strong> is the round you would spend to keep this rookie &mdash; {src_phrase} "
+        f"pushed back {keeper_discount} picks (half-round keeper discount), placed in a {teams}-team draft. "
+        f"Sorted best value first."
+    ) if has_value else (
+        "Ranked by dynasty rookie consensus. Keeper-cost values will appear once FantasyPros publishes "
+        "rankings for this class."
     )
 
     return f"""{_head(f"Rookie Values {year}", "Incoming rookie ADP and draft cost")}
