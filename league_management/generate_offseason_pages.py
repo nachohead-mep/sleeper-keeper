@@ -1499,10 +1499,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
     pos_options = "".join(f'<option value="{_escape(p)}">{_escape(p)}</option>' for p in positions)
 
     has_value = bool(df["value_pick"].notna().any()) if "value_pick" in df.columns else False
-    src = ""
-    if "value_source" in df.columns and df["value_source"].astype(bool).any():
-        src = df.loc[df["value_source"].astype(bool), "value_source"].iloc[0]
-    val_label = "ADP" if src == "ADP" else "Overall"
+    val_label = "ADP"  # the draft-position column (raw — no discount)
 
     def _round_pick(n):
         """Overall pick number -> 'round.pick (overall)', e.g. 14 -> '2.02 (14)'.
@@ -1547,18 +1544,16 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
         f'<th data-col="4" data-num="1">{val_label} <span class="sort-arrow"></span></th>'
         f'<th data-col="5" data-num="1">Round Cost <span class="sort-arrow"></span></th>'
     ) if has_value else ''
-    src_word = "ADP" if src == "ADP" else "ECR"
-    subtitle = f"{len(df)} rookies &middot; round cost from FantasyPros {src_word}"
-    src_phrase = ("their redraft ADP" if src == "ADP"
-                  else "their overall consensus ranking (redraft ADP isn't published yet)")
+    as_of = datetime.date.today().strftime("%b %d, %Y").replace(" 0", " ")
+    subtitle = f"{len(df)} rookies &middot; ADP-based round cost &middot; as of {as_of}"
     intro = (
-        f"<strong>Round Cost</strong> is the round it costs to draft this rookie &mdash; {src_phrase} "
-        f"pushed back {keeper_discount} picks (half-round rookie discount), placed in our {teams}-team, "
-        f"{rounds}-round draft. Anything past round {rounds} locks to a last-round ({rounds}) pick. "
-        f"Sorted best value first."
+        f"<strong>ADP</strong> is each rookie's draft position (round.pick) &mdash; no discount. "
+        f"<strong>Round Cost</strong> applies the half-round rookie discount (ADP pushed back {keeper_discount} "
+        f"picks) and places it in our {teams}-team, {rounds}-round draft &mdash; anything past round {rounds} "
+        f"locks to a last-round ({rounds}) pick. Sorted best value first. Values refresh on each rebuild."
     ) if has_value else (
-        "Ranked by dynasty rookie consensus. Round-cost values will appear once FantasyPros publishes "
-        "rankings for this class."
+        "Ranked by rookie consensus. ADP and round-cost values will appear once FantasyPros publishes "
+        "data for this class."
     )
     affected_n = int(df["discount_affects"].sum()) if "discount_affects" in df.columns else 0
     legend = (
