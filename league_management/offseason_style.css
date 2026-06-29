@@ -620,15 +620,17 @@ body.wc-theme .section-card {
     .odds-seg .seg-pct { display: none; }
     .flag { height: 11px; }
 
-    /* Penalty shootout: the flying-ball lane doesn't fit a phone, so drop it and
-       show a clean name + colour-coded commentary stack (colour = the outcome). */
+    /* Penalty shootout: keep the kick animation but give the ball a full-width
+       lane. Name on top, [lane -> keeper goal] on its own row, commentary below. */
     .pitch { padding: 12px 10px 8px; }
     .goal-banner { font-size: 0.62rem; letter-spacing: 0.03em; }
-    .kicker { flex-wrap: wrap; row-gap: 2px; padding: 8px 10px; gap: 4px; }
-    .kicker .lane, .kicker .keeper, .kicker .net { display: none; }
-    .kicker-name { flex: 1 1 100%; width: 100%; max-width: 100%; font-size: 0.84rem; }
+    .kicker { flex-wrap: wrap; row-gap: 3px; padding: 8px 10px; gap: 5px; align-items: center; }
+    .kicker-name { width: auto; max-width: 52%; font-size: 0.82rem; }
+    .lane { flex: 1 1 60px; min-width: 40px; }
+    .keeper { font-size: 1.1rem; }
+    .net { font-size: 1.2rem; }
     .kicker-result { flex: 1 1 100%; width: 100%; text-align: left; font-size: 0.76rem; }
-    .avatar.av-md { width: 26px; height: 26px; }
+    .avatar.av-md { width: 24px; height: 24px; }
 
     /* Lottery board: wrapping grid (auto-flow column can leak width on phones) */
     .board {
