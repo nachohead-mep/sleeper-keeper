@@ -1368,6 +1368,10 @@ def generate_lottery(pick_rows, year, sheet_id):
             start pending and fill in as the draw runs.
         </p>
         <div class="order-list" id="fullOrder"></div>
+        <p style="margin-top:14px;">
+            <a class="sheet-link" href="rookie-values.html">&#128202; Rookie values &rarr;</a>
+            <span style="color:var(--text-muted); font-size:0.78rem; margin-left:6px;">updated through the offseason &mdash; subject to change</span>
+        </p>
     </div>
 
     <div class="section-card">
