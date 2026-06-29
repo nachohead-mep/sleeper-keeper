@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Rookie Draft Lottery 2026">
+    <meta property="og:description" content="Provably-fair World Cup draw for the rookie draft">
+    <meta property="og:image" content="https://nachohead-mep.github.io/sleeper-keeper/images/og-default.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Rookie Draft Lottery 2026">
+    <meta name="twitter:description" content="Provably-fair World Cup draw for the rookie draft">
+    <meta name="twitter:image" content="https://nachohead-mep.github.io/sleeper-keeper/images/og-default.png">
+    <title>Rookie Draft Lottery 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="wc-theme">
+<nav class="site-nav">
+    <a class="site-nav-home" href="index.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="24" height="24">
+  <defs>
+    <linearGradient id="ball" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C4742F"/>
+      <stop offset="40%" stop-color="#A0522D"/>
+      <stop offset="100%" stop-color="#6B3410"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+    <linearGradient id="deltaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+
+    <!-- Clip: only show football inside the delta's inner triangle (the hole) -->
+    <clipPath id="deltaHole">
+      <path d="M100,72 L60,148 L140,148 Z"/>
+    </clipPath>
+    <clipPath id="exitTopLeft">
+      <!-- Area below the delta's inner bottom edge only (bottom-left exit) -->
+      <polygon points="0,148 60,148 0,200"/>
+    </clipPath>
+    <clipPath id="exitBottomRight">
+      <!-- Area below and to the right of the delta's inner triangle -->
+      <polygon points="200,0 100,72 140,148 200,200 200,0"/>
+    </clipPath>
+  </defs>
+
+  <!-- Full delta drawn as one solid piece (back layer) -->
+  <g filter="url(#shadow)">
+    <!-- Outer triangle -->
+    <path d="M100,25 L40,160 L160,160 Z" fill="url(#deltaGrad)"/>
+    <!-- Inner cutout (matches background) -->
+    <path d="M100,72 L60,148 L140,148 Z" fill="#1a1d24"/>
+  </g>
+
+  <!-- Football - clipped to only show through the delta's hole -->
+  <g clip-path="url(#deltaHole)">
+    <g transform="translate(100, 112) rotate(-35)" filter="url(#shadow)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-left (in front of delta) -->
+  <g clip-path="url(#exitTopLeft)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Football poking out bottom-right (in front of delta) -->
+  <g clip-path="url(#exitBottomRight)">
+    <g transform="translate(100, 112) rotate(-35)">
+      <ellipse cx="0" cy="0" rx="50" ry="30" fill="url(#ball)" stroke="#5C2D06" stroke-width="1.5"/>
+      <ellipse cx="-10" cy="-10" rx="32" ry="15" fill="#C4742F" opacity="0.4"/>
+      <line x1="-18" y1="0" x2="18" y2="0" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="-10" y1="-6" x2="-10" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="-3" y1="-7" x2="-3" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="4" y1="-7" x2="4" y2="7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="11" y1="-6" x2="11" y2="6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M-46,-8 Q-26,-28 0,-30 Q26,-28 46,-8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+      <path d="M-46,8 Q-26,28 0,30 Q26,28 46,8" fill="none" stroke="#5C2D06" stroke-width="1.2"/>
+    </g>
+  </g>
+
+  <!-- Motion lines -->
+  <g opacity="0.3" stroke="#60a5fa" stroke-width="2" stroke-linecap="round">
+    <line x1="155" y1="78" x2="175" y2="65"/>
+    <line x1="158" y1="88" x2="182" y2="79"/>
+    <line x1="156" y1="98" x2="178" y2="93"/>
+  </g>
+</svg>
+ Delta League</a>
+</nav>
+<div class="container-narrow">
+    <div class="page-header wc-header">
+        <div class="page-header-icon">&#127942;</div>
+        <h1>The Draw 2026</h1>
+        <p class="subtitle">Weighted ball draw for picks 2&ndash;6 &middot; provably fair</p>
+        <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
+    </div>
+
+    <div class="section-card lottery-intro">
+        <h2>&#9917; How the draw works</h2>
+        <ol>
+            <li>Before the draw, everyone agrees on a <strong>public seed</strong> &mdash; e.g. the combined
+                score of a chosen match, a future block hash, anything nobody can predict or control.</li>
+            <li>The seed feeds a deterministic generator (visible in this page's source) that fills a pot with
+                <strong>100 balls</strong> split by each nation's odds, then <strong>draws one ball at a time</strong>,
+                returning any nation already placed to the pot, until picks 2&ndash;6 are set.</li>
+            <li>Same seed &rarr; same draw, every time. Anyone can re-run it and verify. Nobody, including
+                the commissioner, can rig it.</li>
+        </ol>
+    </div>
+
+    <div class="section-card">
+        <h2>&#127942; The Draw</h2>
+        <div class="seed-controls">
+            <input id="seed" placeholder="Enter the agreed-upon public seed (e.g. MNF-total-47)">
+            <label class="toggle-label"><input type="checkbox" id="instant"> instant</label>
+            <button class="btn" id="runBtn">Begin the Draw</button>
+        </div>
+        <div class="seed-note">
+            Leave blank to generate a random seed (fine for a test run; agree on a public seed for the real draw).
+            Seed used: <span class="seed-shown" id="seedShown">&mdash;</span>
+        </div>
+        <div class="permalink-box" id="permaBox" style="display:none">
+            <span class="permalink-label">&#128279; Shareable link</span>
+            <input id="permaUrl" class="permalink-url" readonly>
+            <button class="btn btn-small" id="permalink">Copy</button>
+        </div>
+
+        <button type="button" class="collapse-btn" id="potToggle" aria-expanded="false" aria-controls="drawMechanics">
+            <span class="chev">&#9656;</span>
+            <span id="potToggleLabel">Show the odds picker</span>
+        </button>
+
+        <div id="drawMechanics" class="hidden">
+            <div class="pot-label">The pot &mdash; 100 balls by odds</div>
+            <div class="odds-bar" id="oddsBar"></div>
+        </div>
+
+        <div class="roll-stage" id="rollStage">
+            <div class="draw-ball">
+                <span class="draw-ball-icon" id="drawBall">&#9917;</span>
+                <span class="roll-num" id="rollNum">&ndash;</span>
+            </div>
+        </div>
+
+        <div class="roll-status" id="rollStatus">Press <strong>Begin the Draw</strong> to start the ceremony.</div>
+
+        <div class="pitch" id="pitch" style="display:none"></div>
+
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="section-card">
+        <h2>&#127942; Full draft order</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:12px;">
+            All 12 picks. The
+            <span style="color:var(--wc-gold)">lottery slots (picks 2&ndash;6)</span>
+            start pending and fill in as the draw runs.
+        </p>
+        <div class="order-list" id="fullOrder"></div>
+    </div>
+
+    <div class="section-card">
+        <h2>&#128202; Verify the odds</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem;">
+            Don't take it on faith &mdash; simulate. This runs the <em>exact same</em> draw routine
+            hundreds of thousands of times in your browser and shows how often each nation lands at each pick.
+        </p>
+        <button class="btn" id="simBtn" style="margin-top:10px;">Run 200,000 simulations</button>
+        <table class="sim-table" id="simTable"></table>
+        <p class="seed-note" id="simNote"></p>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox"><img id="lightbox-img" alt="headshot"></div>
+
+<script>
+
+const TEAMS = [{"name": "DannyN", "label": "Consolation Runner Up", "lo": 1, "hi": 30, "weight": 30, "color": "#3b82f6", "cc": "", "photo": "photos/DannyN.png"}, {"name": "zachmassey", "label": "Consolation 3rd", "lo": 31, "hi": 55, "weight": 25, "color": "#10b981", "cc": "", "photo": "photos/zachmassey.png"}, {"name": "jpersily", "label": "Consolation 4th", "lo": 56, "hi": 75, "weight": 20, "color": "#f59e0b", "cc": "", "photo": "photos/jpersily.png"}, {"name": "jaw7475", "label": "Consolation 5th", "lo": 76, "hi": 90, "weight": 15, "color": "#ef4444", "cc": "", "photo": "photos/jaw7475.png"}, {"name": "JoshWasserman", "label": "Consolation 6th/Sacko", "lo": 91, "hi": 100, "weight": 10, "color": "#a855f7", "cc": "", "photo": "photos/JoshWasserman.png"}];
+const ALL_PICKS = [{"pick": "1", "team": "JoshWasserman (from spencerrubin7)", "lottery": false, "photo": "photos/JoshWasserman.png"}, {"pick": "2", "team": "LOTTERY (30% DannyN)", "lottery": true, "photo": ""}, {"pick": "3", "team": "LOTTERY (25% zachmassey)", "lottery": true, "photo": ""}, {"pick": "4", "team": "LOTTERY (20% jpersily)", "lottery": true, "photo": ""}, {"pick": "5", "team": "LOTTERY (15% jaw7475)", "lottery": true, "photo": ""}, {"pick": "6", "team": "LOTTERY (10% JoshWasserman)", "lottery": true, "photo": ""}, {"pick": "7", "team": "Gohrdo", "lottery": false, "photo": "photos/Gohrdo.png"}, {"pick": "8", "team": "zachjd5", "lottery": false, "photo": "photos/zachjd5.png"}, {"pick": "9", "team": "JoshWasserman (from dbleykhman)", "lottery": false, "photo": "photos/JoshWasserman.png"}, {"pick": "10", "team": "Friedo", "lottery": false, "photo": "photos/Friedo.png"}, {"pick": "11", "team": "ashanes", "lottery": false, "photo": "photos/ashanes.png"}, {"pick": "12", "team": "skippo", "lottery": false, "photo": "photos/skippo.png"}];  // full 1-N order; lottery slots get filled by the draw
+
+// ── Deterministic PRNG (seed string -> reproducible stream) ──────────
+function cyrb53(str, seed) {
+  let h1 = 0xdeadbeef ^ (seed || 0), h2 = 0x41c6ce57 ^ (seed || 0);
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h1 >>> 0);
+}
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function rngFromSeed(s) { return mulberry32(cyrb53(s)); }
+
+function teamForRoll(roll) {
+  for (let i = 0; i < TEAMS.length; i++)
+    if (roll >= TEAMS[i].lo && roll <= TEAMS[i].hi) return i;
+  return -1;
+}
+
+// Sequential weighted draw without replacement, via repeated 1-100 rolls
+// (re-roll on an already-drafted team). Returns the full ordered result plus
+// a log of every roll so the animation can replay it faithfully.
+function runLottery(rng) {
+  const taken = new Set();
+  const order = [];     // order[k] -> overall pick (k + 2)
+  const log = [];
+  while (order.length < TEAMS.length - 1) {
+    const roll = 1 + Math.floor(rng() * 100);
+    const ti = teamForRoll(roll);
+    const skipped = taken.has(ti);
+    if (!skipped) { taken.add(ti); order.push(ti); }
+    log.push({ roll: roll, teamIndex: ti, skipped: skipped, pick: skipped ? null : order.length + 1 });
+  }
+  const last = TEAMS.findIndex((_, i) => !taken.has(i));
+  order.push(last);
+  log.push({ roll: null, teamIndex: last, skipped: false, pick: order.length + 1, auto: true });
+  return { order: order, log: log };
+}
+
+// ── DOM helpers ─────────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let animating = false;
+
+function flagHtml(t) {
+  return t.cc ? '<img class="flag" src="https://flagcdn.com/h20/' + t.cc + '.png" alt=""> ' : '';
+}
+function avatarHtml(photo, cls) {
+  return photo ? '<img class="avatar ' + (cls || "") + '" src="' + photo + '" alt="" loading="lazy"> ' : '';
+}
+
+function buildBar() {
+  const bar = $("oddsBar");
+  bar.innerHTML = "";
+  TEAMS.forEach((t, i) => {
+    const seg = document.createElement("div");
+    seg.className = "odds-seg"; seg.id = "seg-" + i;
+    seg.style.flexGrow = t.weight; seg.style.background = t.color;
+    seg.innerHTML = '<span class="seg-name">' + flagHtml(t) + t.name + '</span>' +
+                    '<span class="seg-pct">' + t.weight + ' balls &middot; ' + t.lo + '-' + t.hi + '</span>';
+    bar.appendChild(seg);
+  });
+  const ptr = document.createElement("div");
+  ptr.className = "odds-pointer"; ptr.id = "oddsPointer"; ptr.style.left = "0%";
+  bar.appendChild(ptr);
+}
+function movePointer(roll) { $("oddsPointer").style.left = (roll - 0.5) + "%"; }
+function dimSegments(on) {
+  TEAMS.forEach((_, i) => $("seg-" + i).classList.toggle("dim", on));
+}
+function hotSegment(i) {
+  TEAMS.forEach((_, j) => $("seg-" + j).classList.toggle("hot", j === i));
+}
+
+function buildBoard() {
+  const b = $("board");
+  b.innerHTML = "";
+  for (let p = 2; p <= TEAMS.length + 1; p++) {
+    const slot = document.createElement("div");
+    slot.className = "board-slot"; slot.id = "slot-" + p;
+    slot.innerHTML = '<div class="slot-pick">Pick ' + p + '</div>' +
+                     '<div class="slot-team">&mdash;</div>' +
+                     '<div class="slot-roll">&nbsp;</div>';
+    b.appendChild(slot);
+  }
+}
+function fillSlot(pick, teamIndex, roll) {
+  const slot = $("slot-" + pick);
+  const t = TEAMS[teamIndex];
+  slot.classList.add("filled", "reveal");
+  slot.querySelector(".slot-team").innerHTML =
+    avatarHtml(t.photo, "av-md") + flagHtml(t) + t.name;
+  slot.querySelector(".slot-roll").textContent = roll === null ? "last ball remaining" : "ball " + roll;
+  slot.addEventListener("animationend", () => slot.classList.remove("reveal"), { once: true });
+}
+
+// Full draft order (picks 1..N). Lottery slots start "pending" and fill as drawn.
+function buildFullOrder() {
+  const el = $("fullOrder");
+  el.innerHTML = "";
+  ALL_PICKS.forEach((p) => {
+    const row = document.createElement("div");
+    row.className = "order-row" + (p.lottery ? " is-lottery" : "");
+    if (p.lottery) row.id = "full-" + p.pick;
+    const team = p.lottery
+      ? '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>'
+      : avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    row.innerHTML = '<span class="order-pick">' + p.pick + '</span>' +
+                    '<span class="order-team">' + team + '</span>';
+    el.appendChild(row);
+  });
+}
+function setFullOrder(pick, teamIndex) {
+  const row = $("full-" + pick);
+  if (!row) return;
+  const t = TEAMS[teamIndex];
+  row.classList.add("filled", "reveal");
+  row.querySelector(".order-team").innerHTML =
+    avatarHtml(t.photo, "av-sm") + flagHtml(t) + t.name;
+  row.addEventListener("animationend", () => row.classList.remove("reveal"), { once: true });
+}
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function animateRoll(target, dur) {
+  return new Promise((resolve) => {
+    const el = $("rollNum"), ball = $("drawBall");
+    ball.classList.add("rolling");
+    const start = performance.now();
+    let last = 0;
+    function frame(now) {
+      const p = Math.min(1, (now - start) / dur);
+      if (p < 0.88) {
+        // slow the visible flicker so the numbers are readable, not a blur
+        if (now - last > 70) { const r = 1 + Math.floor(Math.random() * 100); el.textContent = r; movePointer(r); last = now; }
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = target; movePointer(target); ball.classList.remove("rolling"); resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function buildPermalink(seedStr) {
+  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1";
+}
+
+// How far the drawn number sits from a team's ball-range (0 if inside).
+function rangeDistance(roll, t) {
+  if (roll < t.lo) return t.lo - roll;
+  if (roll > t.hi) return roll - t.hi;
+  return 0;
+}
+
+// Penalty shootout for one pick. The nation the ball landed on scores; the
+// others are ranked by how close their range was to the number — closest is
+// saved, next clangs off the crossbar, the rest sky it. Purely cosmetic: the
+// winner is already decided by the provably-fair draw above.
+const SHOT = {
+  score:    { result: "GOAL!" },
+  saved:    { result: "saved" },
+  crossbar: { result: "off the bar!" },
+  miss:     { result: "missed" },
+};
+const REVEAL_ORDER = { miss: 0, crossbar: 1, saved: 2, score: 3 };
+
+function shootout(remaining, winnerIdx, roll, instant) {
+  const pitch = $("pitch");
+  pitch.style.display = "block";
+  pitch.innerHTML = '<div class="goal-banner">&#129349; Penalty shootout for the pick</div>';
+
+  // Assign each kicker an outcome.
+  const outcome = {};
+  outcome[winnerIdx] = "score";
+  remaining.filter((ti) => ti !== winnerIdx)
+    .sort((a, b) => rangeDistance(roll, TEAMS[a]) - rangeDistance(roll, TEAMS[b]))
+    .forEach((ti, idx) => { outcome[ti] = idx === 0 ? "saved" : idx === 1 ? "crossbar" : "miss"; });
+
+  const rows = remaining.map((ti) => {
+    const t = TEAMS[ti];
+    const row = document.createElement("div");
+    row.className = "kicker";
+    row.innerHTML =
+      '<span class="kicker-name">' + avatarHtml(t.photo, "av-md") + flagHtml(t) + t.name + '</span>' +
+      '<span class="lane"><span class="ball">&#9917;</span></span>' +
+      '<span class="keeper">&#129508;</span>' +
+      '<span class="net">&#129349;</span>' +
+      '<span class="kicker-result"></span>';
+    pitch.appendChild(row);
+    return { ti: ti, row: row };
+  });
+  const settle = ({ ti, row }) => {
+    const oc = outcome[ti];
+    row.classList.add(oc);
+    row.querySelector(".kicker-result").textContent = SHOT[oc].result;
+  };
+  if (instant) { rows.forEach(settle); return Promise.resolve(); }
+
+  // Reveal misses first, building up to the goal.
+  const order = rows.slice().sort((a, b) => REVEAL_ORDER[outcome[a.ti]] - REVEAL_ORDER[outcome[b.ti]]);
+  void pitch.offsetWidth; // force reflow so CSS transitions/animations fire
+  return new Promise((resolve) => {
+    order.forEach((r, i) => setTimeout(() => settle(r), 400 + i * 700));
+    setTimeout(resolve, 400 + order.length * 700 + 1300);
+  });
+}
+
+async function play(seedStr, instant) {
+  if (animating) return;
+  animating = true;
+  $("runBtn").disabled = true;
+  try { $("rollStage").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+  $("seedShown").textContent = seedStr;
+  $("permaUrl").value = buildPermalink(seedStr);
+  $("permaBox").style.display = "flex";
+  buildBoard(); buildFullOrder(); dimSegments(false); hotSegment(-1);
+  $("pitch").style.display = "none"; $("pitch").innerHTML = "";
+
+  const placed = new Set();
+  const { log } = runLottery(rngFromSeed(seedStr));
+  for (const ev of log) {
+    if (ev.roll !== null) {
+      // The ball + number always show; movePointer just updates the (maybe-hidden) odds bar.
+      if (instant) { $("rollNum").textContent = ev.roll; movePointer(ev.roll); }
+      else await animateRoll(ev.roll, 1700);
+    }
+    if (ev.skipped) {
+      // Landed on a team already out of the pot — don't re-highlight them.
+      $("rollStatus").innerHTML = '<span style="color:var(--accent-yellow)">Ball ' + ev.roll +
+        ' &rarr; ' + TEAMS[ev.teamIndex].name + ' already drawn &mdash; back in the pot</span>';
+      if (!instant) await sleep(950);
+    } else {
+      hotSegment(ev.teamIndex);
+      const remaining = TEAMS.map((_, i) => i).filter((i) => !placed.has(i));
+      $("rollStatus").innerHTML = ev.auto
+        ? '<strong>' + TEAMS[ev.teamIndex].name + '</strong> is last in the pot &mdash; tap-in for Pick ' + ev.pick
+        : 'Ball ' + ev.roll + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> steps up for Pick ' + ev.pick;
+      await shootout(remaining, ev.teamIndex, ev.roll, instant);
+      placed.add(ev.teamIndex);
+      fillSlot(ev.pick, ev.teamIndex, ev.roll);
+      setFullOrder(ev.pick, ev.teamIndex);
+      $("seg-" + ev.teamIndex).classList.add("dim");
+      hotSegment(-1); // clear the highlight now that they're out of the pool
+      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
+      if (!instant) await sleep(1100);
+    }
+  }
+  hotSegment(-1);
+  $("pitch").style.display = "none";
+  $("rollStatus").innerHTML = '&#127942; <span style="color:var(--accent-green)">The draw is complete &mdash; reproducible from the seed above.</span>';
+  $("runBtn").disabled = false; $("runBtn").textContent = "Draw Again";
+  animating = false;
+}
+
+// ── Monte Carlo fairness check ──────────────────────────────────────
+function runSimulation() {
+  const N = 200000;
+  const counts = TEAMS.map(() => new Array(TEAMS.length).fill(0));
+  for (let n = 0; n < N; n++) {
+    const { order } = runLottery(Math.random);
+    order.forEach((ti, slot) => { counts[ti][slot]++; });
+  }
+  let head = '<tr><th class="team-cell">Team</th><th>Target<br>(Pick 2)</th>';
+  for (let p = 2; p <= TEAMS.length + 1; p++) head += '<th>Pick ' + p + '</th>';
+  head += '</tr>';
+  let body = "";
+  TEAMS.forEach((t, i) => {
+    const sim2 = 100 * counts[i][0] / N;
+    const good = Math.abs(sim2 - t.weight) < 0.6;
+    body += '<tr><td class="team-cell"><span class="slot-dot" style="background:' + t.color +
+            '"></span>' + flagHtml(t) + t.name + '</td>';
+    body += '<td class="target">' + t.weight + '%</td>';
+    counts[i].forEach((c, slot) => {
+      const pct = (100 * c / N).toFixed(1);
+      const cls = slot === 0 ? (good ? "match-good" : "") : "";
+      body += '<td class="' + cls + '">' + pct + '%</td>';
+    });
+    body += '</tr>';
+  });
+  $("simTable").innerHTML = head + body;
+  $("simNote").textContent = "Each team's Pick-2 rate (green) matches its target odds within rounding — the " +
+    "draw respects the weights. Run again for a fresh " + N.toLocaleString() + "-draw sample.";
+}
+
+// ── Wiring ──────────────────────────────────────────────────────────
+function randomSeed() {
+  return "delta-" + Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 6);
+}
+buildBar(); buildBoard(); buildFullOrder();
+$("runBtn").addEventListener("click", () => {
+  let s = $("seed").value.trim();
+  if (!s) { s = randomSeed(); $("seed").value = s; }
+  play(s, $("instant").checked);
+});
+$("permalink").addEventListener("click", () => {
+  $("permaUrl").select();
+  navigator.clipboard.writeText($("permaUrl").value).then(() => {
+    $("permalink").textContent = "✓ Copied";
+    setTimeout(() => { $("permalink").textContent = "Copy"; }, 1600);
+  });
+});
+$("simBtn").addEventListener("click", () => {
+  $("simBtn").disabled = true; $("simNote").textContent = "Running 200,000 draws…";
+  setTimeout(() => { runSimulation(); $("simBtn").disabled = false; }, 30);
+});
+$("potToggle").addEventListener("click", () => {
+  const hidden = $("drawMechanics").classList.toggle("hidden");
+  $("potToggle").classList.toggle("open", !hidden);
+  $("potToggle").setAttribute("aria-expanded", String(!hidden));
+  $("potToggleLabel").textContent = (hidden ? "Show" : "Hide") + " the odds picker";
+});
+
+// Click any headshot to enlarge it
+document.addEventListener("click", (e) => {
+  const lb = $("lightbox");
+  const img = e.target.closest ? e.target.closest("img.avatar") : null;
+  if (img) { $("lightbox-img").src = img.src; lb.classList.add("open"); }
+  else if (e.target === lb) { lb.classList.remove("open"); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") $("lightbox").classList.remove("open");
+});
+
+const params = new URLSearchParams(location.search);
+if (params.get("seed")) {
+  $("seed").value = params.get("seed");
+  if (params.get("run")) play(params.get("seed"), false);
+}
+
+</script>
+</body></html>
