@@ -224,6 +224,11 @@ def generate_landing(year, sheet_id):
             <h2>Rookie Draft</h2>
             <p>Pick order, lottery odds, and traded picks for {year}.</p>
         </a>
+        <a class="landing-card" href="rookie-lottery.html">
+            <div class="card-icon">&#9917;</div>
+            <h2>The Draw</h2>
+            <p>Provably-fair World Cup&ndash;style draw for picks 2&ndash;6. Run it live and verify the odds.</p>
+        </a>
     </div>
 </div>
 </body></html>"""
@@ -703,6 +708,7 @@ def generate_rookie_draft(pick_rows, year, sheet_id):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Draft {year}</h1>
         <p class="subtitle">Pick order &middot; Lottery odds &middot; Trade notes</p>
+        <a class="sheet-link" href="rookie-lottery.html">&#127942; Run the Draft Lottery</a>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -734,6 +740,587 @@ def generate_rookie_draft(pick_rows, year, sheet_id):
 
 
 # ============================================================================
+# Rookie Lottery — provably-fair animated draw
+# ============================================================================
+LOTTERY_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#a855f7",
+                  "#06b6d4", "#ec4899", "#84cc16"]
+
+# World Cup theme: map each lottery entrant (Sleeper name) to a 2-letter country
+# code so their flag shows in the draw — matching the deltaworldcup draft site.
+# Fill these in to match each manager's nation. Unmapped names just show no flag.
+LOTTERY_FLAGS = {
+    # "DannyN": "fr",
+    # "zachmassey": "br",
+    # "jpersily": "de",
+    # "jaw7475": "ar",
+    # "JoshWasserman": "pt",
+}
+
+
+def _parse_lottery_participants(pick_rows):
+    """Extract lottery entrants (name + weight) from the rookie-draft rows.
+
+    The lottery section rows look like:
+        ["", "Consolation Runner Up (DannyN)", "1-30"]
+    where the parenthetical is the team name and the range width is the weight.
+    """
+    import re
+
+    participants = []
+    section = None
+    for row in pick_rows[1:]:
+        pick, team, player = (list(row) + ["", "", ""])[:3]
+        if team == "Lottery Odds":
+            section = "lottery"
+            continue
+        if team == "Trade Notes" or pick == "Year":
+            section = "trades"
+            continue
+        if section != "lottery" or not team:
+            continue
+
+        m = re.search(r"\(([^)]*)\)\s*$", team)
+        name = m.group(1).strip() if m else team.strip()
+        label = re.sub(r"\s*\([^)]*\)\s*$", "", team).strip()
+        parts = str(player).strip().split("-")
+        try:
+            lo, hi = int(parts[0]), int(parts[1])
+        except (ValueError, IndexError):
+            continue
+        participants.append({
+            "name": name, "label": label,
+            "lo": lo, "hi": hi, "weight": hi - lo + 1,
+        })
+    return participants
+
+
+def _parse_all_picks(pick_rows):
+    """Return the full draft order (picks 1..N) from the rookie-draft rows.
+
+    Lottery picks (team contains 'LOTTERY') are flagged so the page can show them
+    as pending slots pre-draw and fill them in as the lottery resolves.
+    """
+    picks = []
+    for row in pick_rows[1:]:
+        pick, team, player = (list(row) + ["", "", ""])[:3]
+        if team in ("Lottery Odds", "Trade Notes") or pick == "Year":
+            break  # reached the reference sections below the pick list
+        if not str(pick).strip() and not str(team).strip():
+            continue
+        picks.append({"pick": str(pick).strip(), "team": str(team).strip(),
+                      "lottery": "LOTTERY" in str(team)})
+    return picks
+
+
+def _owner_handle(team_str):
+    """Strip an acquired-pick note to the owning manager's handle.
+
+    'JoshWasserman (from spencerrubin7)' -> 'JoshWasserman'; 'Gohrdo' -> 'Gohrdo'.
+    """
+    import re
+    return re.sub(r"\s*\(from[^)]*\)\s*$", "", str(team_str)).strip()
+
+
+def _available_photos():
+    """Set of manager handles that have a headshot in assets/photos/."""
+    photos_dir = os.path.join(script_dir, "..", "assets", "photos")
+    if not os.path.isdir(photos_dir):
+        return set()
+    return {os.path.splitext(f)[0] for f in os.listdir(photos_dir)
+            if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))}
+
+
+def _photo_url(handle, available):
+    return f"photos/{handle}.png" if handle in available else ""
+
+
+# Plain (non-f) string: all { } and ${ } are literal JS. Only __TEAMS__ is replaced.
+LOTTERY_JS = r"""
+const TEAMS = __TEAMS__;
+const ALL_PICKS = __PICKS__;  // full 1-N order; lottery slots get filled by the draw
+
+// ── Deterministic PRNG (seed string -> reproducible stream) ──────────
+function cyrb53(str, seed) {
+  let h1 = 0xdeadbeef ^ (seed || 0), h2 = 0x41c6ce57 ^ (seed || 0);
+  for (let i = 0; i < str.length; i++) {
+    const ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h1 >>> 0);
+}
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function rngFromSeed(s) { return mulberry32(cyrb53(s)); }
+
+function teamForRoll(roll) {
+  for (let i = 0; i < TEAMS.length; i++)
+    if (roll >= TEAMS[i].lo && roll <= TEAMS[i].hi) return i;
+  return -1;
+}
+
+// Sequential weighted draw without replacement, via repeated 1-100 rolls
+// (re-roll on an already-drafted team). Returns the full ordered result plus
+// a log of every roll so the animation can replay it faithfully.
+function runLottery(rng) {
+  const taken = new Set();
+  const order = [];     // order[k] -> overall pick (k + 2)
+  const log = [];
+  while (order.length < TEAMS.length - 1) {
+    const roll = 1 + Math.floor(rng() * 100);
+    const ti = teamForRoll(roll);
+    const skipped = taken.has(ti);
+    if (!skipped) { taken.add(ti); order.push(ti); }
+    log.push({ roll: roll, teamIndex: ti, skipped: skipped, pick: skipped ? null : order.length + 1 });
+  }
+  const last = TEAMS.findIndex((_, i) => !taken.has(i));
+  order.push(last);
+  log.push({ roll: null, teamIndex: last, skipped: false, pick: order.length + 1, auto: true });
+  return { order: order, log: log };
+}
+
+// ── DOM helpers ─────────────────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+let animating = false;
+
+function flagHtml(t) {
+  return t.cc ? '<img class="flag" src="https://flagcdn.com/h20/' + t.cc + '.png" alt=""> ' : '';
+}
+function avatarHtml(photo, cls) {
+  return photo ? '<img class="avatar ' + (cls || "") + '" src="' + photo + '" alt="" loading="lazy"> ' : '';
+}
+
+function buildBar() {
+  const bar = $("oddsBar");
+  bar.innerHTML = "";
+  TEAMS.forEach((t, i) => {
+    const seg = document.createElement("div");
+    seg.className = "odds-seg"; seg.id = "seg-" + i;
+    seg.style.flexGrow = t.weight; seg.style.background = t.color;
+    seg.innerHTML = '<span class="seg-name">' + flagHtml(t) + t.name + '</span>' +
+                    '<span class="seg-pct">' + t.weight + ' balls &middot; ' + t.lo + '-' + t.hi + '</span>';
+    bar.appendChild(seg);
+  });
+  const ptr = document.createElement("div");
+  ptr.className = "odds-pointer"; ptr.id = "oddsPointer"; ptr.style.left = "0%";
+  bar.appendChild(ptr);
+}
+function movePointer(roll) { $("oddsPointer").style.left = (roll - 0.5) + "%"; }
+function dimSegments(on) {
+  TEAMS.forEach((_, i) => $("seg-" + i).classList.toggle("dim", on));
+}
+function hotSegment(i) {
+  TEAMS.forEach((_, j) => $("seg-" + j).classList.toggle("hot", j === i));
+}
+
+function buildBoard() {
+  const b = $("board");
+  b.innerHTML = "";
+  for (let p = 2; p <= TEAMS.length + 1; p++) {
+    const slot = document.createElement("div");
+    slot.className = "board-slot"; slot.id = "slot-" + p;
+    slot.innerHTML = '<div class="slot-pick">Pick ' + p + '</div>' +
+                     '<div class="slot-team">&mdash;</div>' +
+                     '<div class="slot-roll">&nbsp;</div>';
+    b.appendChild(slot);
+  }
+}
+function fillSlot(pick, teamIndex, roll) {
+  const slot = $("slot-" + pick);
+  const t = TEAMS[teamIndex];
+  slot.classList.add("filled", "reveal");
+  slot.querySelector(".slot-team").innerHTML =
+    avatarHtml(t.photo, "av-md") + flagHtml(t) + t.name;
+  slot.querySelector(".slot-roll").textContent = roll === null ? "last ball remaining" : "ball " + roll;
+  slot.addEventListener("animationend", () => slot.classList.remove("reveal"), { once: true });
+}
+
+// Full draft order (picks 1..N). Lottery slots start "pending" and fill as drawn.
+function buildFullOrder() {
+  const el = $("fullOrder");
+  el.innerHTML = "";
+  ALL_PICKS.forEach((p) => {
+    const row = document.createElement("div");
+    row.className = "order-row" + (p.lottery ? " is-lottery" : "");
+    if (p.lottery) row.id = "full-" + p.pick;
+    const team = p.lottery
+      ? '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>'
+      : avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    row.innerHTML = '<span class="order-pick">' + p.pick + '</span>' +
+                    '<span class="order-team">' + team + '</span>';
+    el.appendChild(row);
+  });
+}
+function setFullOrder(pick, teamIndex) {
+  const row = $("full-" + pick);
+  if (!row) return;
+  const t = TEAMS[teamIndex];
+  row.classList.add("filled", "reveal");
+  row.querySelector(".order-team").innerHTML =
+    avatarHtml(t.photo, "av-sm") + flagHtml(t) + t.name;
+  row.addEventListener("animationend", () => row.classList.remove("reveal"), { once: true });
+}
+function escapeHtml(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function animateRoll(target, dur) {
+  return new Promise((resolve) => {
+    const el = $("rollNum"), ball = $("drawBall");
+    ball.classList.add("rolling");
+    const start = performance.now();
+    let last = 0;
+    function frame(now) {
+      const p = Math.min(1, (now - start) / dur);
+      if (p < 0.88) {
+        // slow the visible flicker so the numbers are readable, not a blur
+        if (now - last > 70) { const r = 1 + Math.floor(Math.random() * 100); el.textContent = r; movePointer(r); last = now; }
+        requestAnimationFrame(frame);
+      } else {
+        el.textContent = target; movePointer(target); ball.classList.remove("rolling"); resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function buildPermalink(seedStr) {
+  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1";
+}
+
+// How far the drawn number sits from a team's ball-range (0 if inside).
+function rangeDistance(roll, t) {
+  if (roll < t.lo) return t.lo - roll;
+  if (roll > t.hi) return roll - t.hi;
+  return 0;
+}
+
+// Penalty shootout for one pick. The nation the ball landed on scores; the
+// others are ranked by how close their range was to the number — closest is
+// saved, next clangs off the crossbar, the rest sky it. Purely cosmetic: the
+// winner is already decided by the provably-fair draw above.
+const SHOT = {
+  score:    { result: "GOAL!" },
+  saved:    { result: "saved" },
+  crossbar: { result: "off the bar!" },
+  miss:     { result: "missed" },
+};
+const REVEAL_ORDER = { miss: 0, crossbar: 1, saved: 2, score: 3 };
+
+function shootout(remaining, winnerIdx, roll, instant) {
+  const pitch = $("pitch");
+  pitch.style.display = "block";
+  pitch.innerHTML = '<div class="goal-banner">&#129349; Penalty shootout for the pick</div>';
+
+  // Assign each kicker an outcome.
+  const outcome = {};
+  outcome[winnerIdx] = "score";
+  remaining.filter((ti) => ti !== winnerIdx)
+    .sort((a, b) => rangeDistance(roll, TEAMS[a]) - rangeDistance(roll, TEAMS[b]))
+    .forEach((ti, idx) => { outcome[ti] = idx === 0 ? "saved" : idx === 1 ? "crossbar" : "miss"; });
+
+  const rows = remaining.map((ti) => {
+    const t = TEAMS[ti];
+    const row = document.createElement("div");
+    row.className = "kicker";
+    row.innerHTML =
+      '<span class="kicker-name">' + avatarHtml(t.photo, "av-md") + flagHtml(t) + t.name + '</span>' +
+      '<span class="lane"><span class="ball">&#9917;</span></span>' +
+      '<span class="keeper">&#129508;</span>' +
+      '<span class="net">&#129349;</span>' +
+      '<span class="kicker-result"></span>';
+    pitch.appendChild(row);
+    return { ti: ti, row: row };
+  });
+  const settle = ({ ti, row }) => {
+    const oc = outcome[ti];
+    row.classList.add(oc);
+    row.querySelector(".kicker-result").textContent = SHOT[oc].result;
+  };
+  if (instant) { rows.forEach(settle); return Promise.resolve(); }
+
+  // Reveal misses first, building up to the goal.
+  const order = rows.slice().sort((a, b) => REVEAL_ORDER[outcome[a.ti]] - REVEAL_ORDER[outcome[b.ti]]);
+  void pitch.offsetWidth; // force reflow so CSS transitions/animations fire
+  return new Promise((resolve) => {
+    order.forEach((r, i) => setTimeout(() => settle(r), 400 + i * 700));
+    setTimeout(resolve, 400 + order.length * 700 + 1300);
+  });
+}
+
+async function play(seedStr, instant) {
+  if (animating) return;
+  animating = true;
+  $("runBtn").disabled = true;
+  try { $("rollStage").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+  $("seedShown").textContent = seedStr;
+  $("permaUrl").value = buildPermalink(seedStr);
+  $("permaBox").style.display = "flex";
+  buildBoard(); buildFullOrder(); dimSegments(false); hotSegment(-1);
+  $("pitch").style.display = "none"; $("pitch").innerHTML = "";
+
+  const placed = new Set();
+  const { log } = runLottery(rngFromSeed(seedStr));
+  for (const ev of log) {
+    if (ev.roll !== null) {
+      // The ball + number always show; movePointer just updates the (maybe-hidden) odds bar.
+      if (instant) { $("rollNum").textContent = ev.roll; movePointer(ev.roll); }
+      else await animateRoll(ev.roll, 1700);
+    }
+    if (ev.skipped) {
+      // Landed on a team already out of the pot — don't re-highlight them.
+      $("rollStatus").innerHTML = '<span style="color:var(--accent-yellow)">Ball ' + ev.roll +
+        ' &rarr; ' + TEAMS[ev.teamIndex].name + ' already drawn &mdash; back in the pot</span>';
+      if (!instant) await sleep(950);
+    } else {
+      hotSegment(ev.teamIndex);
+      const remaining = TEAMS.map((_, i) => i).filter((i) => !placed.has(i));
+      $("rollStatus").innerHTML = ev.auto
+        ? '<strong>' + TEAMS[ev.teamIndex].name + '</strong> is last in the pot &mdash; tap-in for Pick ' + ev.pick
+        : 'Ball ' + ev.roll + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> steps up for Pick ' + ev.pick;
+      await shootout(remaining, ev.teamIndex, ev.roll, instant);
+      placed.add(ev.teamIndex);
+      fillSlot(ev.pick, ev.teamIndex, ev.roll);
+      setFullOrder(ev.pick, ev.teamIndex);
+      $("seg-" + ev.teamIndex).classList.add("dim");
+      hotSegment(-1); // clear the highlight now that they're out of the pool
+      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
+      if (!instant) await sleep(1100);
+    }
+  }
+  hotSegment(-1);
+  $("pitch").style.display = "none";
+  $("rollStatus").innerHTML = '&#127942; <span style="color:var(--accent-green)">The draw is complete &mdash; reproducible from the seed above.</span>';
+  $("runBtn").disabled = false; $("runBtn").textContent = "Draw Again";
+  animating = false;
+}
+
+// ── Monte Carlo fairness check ──────────────────────────────────────
+function runSimulation() {
+  const N = 200000;
+  const counts = TEAMS.map(() => new Array(TEAMS.length).fill(0));
+  for (let n = 0; n < N; n++) {
+    const { order } = runLottery(Math.random);
+    order.forEach((ti, slot) => { counts[ti][slot]++; });
+  }
+  let head = '<tr><th class="team-cell">Team</th><th>Target<br>(Pick 2)</th>';
+  for (let p = 2; p <= TEAMS.length + 1; p++) head += '<th>Pick ' + p + '</th>';
+  head += '</tr>';
+  let body = "";
+  TEAMS.forEach((t, i) => {
+    const sim2 = 100 * counts[i][0] / N;
+    const good = Math.abs(sim2 - t.weight) < 0.6;
+    body += '<tr><td class="team-cell"><span class="slot-dot" style="background:' + t.color +
+            '"></span>' + flagHtml(t) + t.name + '</td>';
+    body += '<td class="target">' + t.weight + '%</td>';
+    counts[i].forEach((c, slot) => {
+      const pct = (100 * c / N).toFixed(1);
+      const cls = slot === 0 ? (good ? "match-good" : "") : "";
+      body += '<td class="' + cls + '">' + pct + '%</td>';
+    });
+    body += '</tr>';
+  });
+  $("simTable").innerHTML = head + body;
+  $("simNote").textContent = "Each team's Pick-2 rate (green) matches its target odds within rounding — the " +
+    "draw respects the weights. Run again for a fresh " + N.toLocaleString() + "-draw sample.";
+}
+
+// ── Wiring ──────────────────────────────────────────────────────────
+function randomSeed() {
+  return "delta-" + Math.random().toString(36).slice(2, 8) + Math.random().toString(36).slice(2, 6);
+}
+buildBar(); buildBoard(); buildFullOrder();
+$("runBtn").addEventListener("click", () => {
+  let s = $("seed").value.trim();
+  if (!s) { s = randomSeed(); $("seed").value = s; }
+  play(s, $("instant").checked);
+});
+$("permalink").addEventListener("click", () => {
+  $("permaUrl").select();
+  navigator.clipboard.writeText($("permaUrl").value).then(() => {
+    $("permalink").textContent = "✓ Copied";
+    setTimeout(() => { $("permalink").textContent = "Copy"; }, 1600);
+  });
+});
+$("simBtn").addEventListener("click", () => {
+  $("simBtn").disabled = true; $("simNote").textContent = "Running 200,000 draws…";
+  setTimeout(() => { runSimulation(); $("simBtn").disabled = false; }, 30);
+});
+$("potToggle").addEventListener("click", () => {
+  const hidden = $("drawMechanics").classList.toggle("hidden");
+  $("potToggle").classList.toggle("open", !hidden);
+  $("potToggle").setAttribute("aria-expanded", String(!hidden));
+  $("potToggleLabel").textContent = (hidden ? "Show" : "Hide") + " the odds picker";
+});
+
+// Click any headshot to enlarge it
+document.addEventListener("click", (e) => {
+  const lb = $("lightbox");
+  const img = e.target.closest ? e.target.closest("img.avatar") : null;
+  if (img) { $("lightbox-img").src = img.src; lb.classList.add("open"); }
+  else if (e.target === lb) { lb.classList.remove("open"); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") $("lightbox").classList.remove("open");
+});
+
+const params = new URLSearchParams(location.search);
+if (params.get("seed")) {
+  $("seed").value = params.get("seed");
+  if (params.get("run")) play(params.get("seed"), false);
+}
+"""
+
+
+def generate_lottery(pick_rows, year, sheet_id):
+    import json
+
+    sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
+    participants = _parse_lottery_participants(pick_rows)
+    available = _available_photos()
+
+    # Attach a stable color + (optional) flag + headshot to each entrant
+    teams = []
+    for i, p in enumerate(participants):
+        teams.append({
+            **p,
+            "color": LOTTERY_COLORS[i % len(LOTTERY_COLORS)],
+            "cc": LOTTERY_FLAGS.get(p["name"], ""),
+            "photo": _photo_url(p["name"], available),
+        })
+
+    if len(teams) < 2:
+        body = """<div class="section-card"><p style="color:var(--text-muted)">
+        Lottery participants aren't set yet. Once the consolation bracket resolves and the
+        Rookie Draft tab is populated, the weighted lottery will appear here.</p></div>"""
+        return f"""{_head(f"Rookie Lottery {year}", "Provably-fair weighted draft lottery")}
+<body>
+{_nav()}
+<div class="container-narrow">
+    <div class="page-header">
+        <div class="page-header-icon">{_logo_page_header()}</div>
+        <h1>Rookie Lottery {year}</h1>
+        <p class="subtitle">Weighted draw for picks 2&ndash;6</p>
+    </div>
+    {body}
+</div>
+</body></html>"""
+
+    all_picks = _parse_all_picks(pick_rows)
+    for p in all_picks:
+        # Lottery slots stay generic placeholders (filled by the draw); non-lottery
+        # picks carry their owner's headshot.
+        p["photo"] = "" if p["lottery"] else _photo_url(_owner_handle(p["team"]), available)
+    js = (LOTTERY_JS
+          .replace("__TEAMS__", json.dumps(teams))
+          .replace("__PICKS__", json.dumps(all_picks)))
+    first_pick = len(teams) + 1  # picks 2 .. (n+1)
+
+    return f"""{_head(f"Rookie Draft Lottery {year}", "Provably-fair World Cup draw for the rookie draft")}
+<body class="wc-theme">
+{_nav()}
+<div class="container-narrow">
+    <div class="page-header wc-header">
+        <div class="page-header-icon">&#127942;</div>
+        <h1>The Draw {year}</h1>
+        <p class="subtitle">Weighted ball draw for picks 2&ndash;{first_pick} &middot; provably fair</p>
+        <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
+    </div>
+
+    <div class="section-card lottery-intro">
+        <h2>&#9917; How the draw works</h2>
+        <ol>
+            <li>Before the draw, everyone agrees on a <strong>public seed</strong> &mdash; e.g. the combined
+                score of a chosen match, a future block hash, anything nobody can predict or control.</li>
+            <li>The seed feeds a deterministic generator (visible in this page's source) that fills a pot with
+                <strong>100 balls</strong> split by each nation's odds, then <strong>draws one ball at a time</strong>,
+                returning any nation already placed to the pot, until picks 2&ndash;{first_pick} are set.</li>
+            <li>Same seed &rarr; same draw, every time. Anyone can re-run it and verify. Nobody, including
+                the commissioner, can rig it.</li>
+        </ol>
+    </div>
+
+    <div class="section-card">
+        <h2>&#127942; The Draw</h2>
+        <div class="seed-controls">
+            <input id="seed" placeholder="Enter the agreed-upon public seed (e.g. MNF-total-47)">
+            <label class="toggle-label"><input type="checkbox" id="instant"> instant</label>
+            <button class="btn" id="runBtn">Begin the Draw</button>
+        </div>
+        <div class="seed-note">
+            Leave blank to generate a random seed (fine for a test run; agree on a public seed for the real draw).
+            Seed used: <span class="seed-shown" id="seedShown">&mdash;</span>
+        </div>
+        <div class="permalink-box" id="permaBox" style="display:none">
+            <span class="permalink-label">&#128279; Shareable link</span>
+            <input id="permaUrl" class="permalink-url" readonly>
+            <button class="btn btn-small" id="permalink">Copy</button>
+        </div>
+
+        <button type="button" class="collapse-btn" id="potToggle" aria-expanded="false" aria-controls="drawMechanics">
+            <span class="chev">&#9656;</span>
+            <span id="potToggleLabel">Show the odds picker</span>
+        </button>
+
+        <div id="drawMechanics" class="hidden">
+            <div class="pot-label">The pot &mdash; 100 balls by odds</div>
+            <div class="odds-bar" id="oddsBar"></div>
+        </div>
+
+        <div class="roll-stage" id="rollStage">
+            <div class="draw-ball">
+                <span class="draw-ball-icon" id="drawBall">&#9917;</span>
+                <span class="roll-num" id="rollNum">&ndash;</span>
+            </div>
+        </div>
+
+        <div class="roll-status" id="rollStatus">Press <strong>Begin the Draw</strong> to start the ceremony.</div>
+
+        <div class="pitch" id="pitch" style="display:none"></div>
+
+        <div class="board" id="board"></div>
+    </div>
+
+    <div class="section-card">
+        <h2>&#127942; Full draft order</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem; margin-bottom:12px;">
+            All {len(all_picks)} picks. The
+            <span style="color:var(--wc-gold)">lottery slots (picks 2&ndash;{first_pick})</span>
+            start pending and fill in as the draw runs.
+        </p>
+        <div class="order-list" id="fullOrder"></div>
+    </div>
+
+    <div class="section-card">
+        <h2>&#128202; Verify the odds</h2>
+        <p style="color:var(--text-secondary); font-size:0.88rem;">
+            Don't take it on faith &mdash; simulate. This runs the <em>exact same</em> draw routine
+            hundreds of thousands of times in your browser and shows how often each nation lands at each pick.
+        </p>
+        <button class="btn" id="simBtn" style="margin-top:10px;">Run 200,000 simulations</button>
+        <table class="sim-table" id="simTable"></table>
+        <p class="seed-note" id="simNote"></p>
+    </div>
+</div>
+
+<div class="lightbox" id="lightbox"><img id="lightbox-img" alt="headshot"></div>
+
+<script>
+{js}
+</script>
+</body></html>"""
+
+
+# ============================================================================
 # Main
 # ============================================================================
 def generate_all_pages(keeper_df, pick_rows, year, sheet_id, output_dir):
@@ -744,6 +1331,15 @@ def generate_all_pages(keeper_df, pick_rows, year, sheet_id, output_dir):
     css_src = os.path.join(script_dir, "offseason_style.css")
     shutil.copy2(css_src, os.path.join(output_dir, "style.css"))
 
+    # Manager headshots (for the lottery / draft order avatars)
+    photos_src = os.path.join(script_dir, "..", "assets", "photos")
+    if os.path.isdir(photos_src):
+        photos_dst = os.path.join(output_dir, "photos")
+        os.makedirs(photos_dst, exist_ok=True)
+        for f in os.listdir(photos_src):
+            if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                shutil.copy2(os.path.join(photos_src, f), os.path.join(photos_dst, f))
+
     # OG image
     generate_og_image(output_dir, year)
 
@@ -753,6 +1349,7 @@ def generate_all_pages(keeper_df, pick_rows, year, sheet_id, output_dir):
         "keeper-selections.html": generate_keeper_selections(keeper_df, year, sheet_id),
         "offseason-proposals.html": generate_proposals(year, sheet_id),
         "rookie-draft.html": generate_rookie_draft(pick_rows, year, sheet_id),
+        "rookie-lottery.html": generate_lottery(pick_rows, year, sheet_id),
     }
 
     for filename, html in pages.items():
