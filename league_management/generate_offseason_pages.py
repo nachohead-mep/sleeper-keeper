@@ -1397,7 +1397,7 @@ def generate_lottery(pick_rows, year, sheet_id):
 # ============================================================================
 # Rookie Values — FantasyPros rookie ADP + draft cost (from the rankings script)
 # ============================================================================
-def _rookie_values_df(year, teams=12, keeper_discount=6):
+def _rookie_values_df(year, teams=12, keeper_discount=6, rounds=16):
     """Run the existing rankings scraper (FantasyPros, no Selenium) for rookie
     values. Returns a DataFrame, or an empty one if the scrape fails — a flaky
     scrape must never break the whole deploy.
@@ -1448,9 +1448,12 @@ def _rookie_values_df(year, teams=12, keeper_discount=6):
         df["discounted_pick"] = discounted.round(0)
         df["rookie_cost_round"] = ((discounted - 1) // teams + 1).astype("Int64")
         # The discount only "matters" when it bumps a player to a cheaper round
-        # vs. their undiscounted value (i.e. value sits in the back half of a round).
-        raw_round = ((df["value_pick"] - 1) // teams + 1).astype("Int64")
-        df["discount_affects"] = (df["rookie_cost_round"] > raw_round).fillna(False)
+        # vs. their undiscounted value — and only if they were draftable to begin
+        # with (a player already past the last round is a free agent either way).
+        raw_round = (df["value_pick"] - 1) // teams + 1
+        df["discount_affects"] = (
+            (df["rookie_cost_round"] > raw_round) & (raw_round <= rounds)
+        ).fillna(False)
 
         df = df.sort_values("value_pick", na_position="last").drop(columns="player_id")
         return df.reset_index(drop=True)
@@ -1459,7 +1462,7 @@ def _rookie_values_df(year, teams=12, keeper_discount=6):
         return pd.DataFrame()
 
 
-def generate_rookie_values(df, year, teams=12, keeper_discount=6):
+def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
     import math
 
     if df is None or df.empty:
@@ -1474,6 +1477,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Values {year}</h1>
         <p class="subtitle">Incoming rookie class</p>
+        <a class="sheet-link" href="rookie-lottery.html">&#127942; Draft lottery &amp; order &rarr;</a>
     </div>
     {body}
 </div>
@@ -1486,16 +1490,33 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
     src = ""
     if "value_source" in df.columns and df["value_source"].astype(bool).any():
         src = df.loc[df["value_source"].astype(bool), "value_source"].iloc[0]
-    val_label = "ADP" if src == "ADP" else "Overall #"
+    val_label = "ADP" if src == "ADP" else "Overall"
+
+    def _round_pick(n):
+        """Overall pick number -> 'round.pick (overall)', e.g. 14 -> '2.02 (14)'.
+        Past the last round it's beyond the draft, so show FA (free agent)."""
+        if n is None or (isinstance(n, float) and math.isnan(n)):
+            return "&mdash;"
+        n = int(round(n))
+        rnd = (n - 1) // teams + 1
+        if rnd > rounds:
+            return f"FA ({n})"
+        pk = (n - 1) % teams + 1
+        return f"{rnd}.{pk:02d} ({n})"
 
     def _val_cells(row, affected):
         if not has_value:
             return ""
         vp = getattr(row, "value_pick", None)
         cost = getattr(row, "rookie_cost_round", None)
-        vp_txt = "&mdash;" if vp is None or (isinstance(vp, float) and math.isnan(vp)) else f"{vp:.0f}"
+        vp_txt = _round_pick(vp)
         try:
-            cost_txt = "&mdash;" if cost is None or (isinstance(cost, float) and math.isnan(cost)) else f"Rd {int(cost)}"
+            if cost is None or (isinstance(cost, float) and math.isnan(cost)):
+                cost_txt = "&mdash;"
+            elif int(cost) > rounds:
+                cost_txt = "FA"  # beyond the last round — no pick needed
+            else:
+                cost_txt = f"Rd {int(cost)}"
         except (ValueError, TypeError):
             cost_txt = "&mdash;"
         if affected and cost_txt != "&mdash;":
@@ -1514,25 +1535,26 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
 
     adp_head = (
         f'<th data-col="4" data-num="1">{val_label} <span class="sort-arrow"></span></th>'
-        f'<th data-col="5" data-num="1">Keeper Rd <span class="sort-arrow"></span></th>'
+        f'<th data-col="5" data-num="1">Round Cost <span class="sort-arrow"></span></th>'
     ) if has_value else ''
     src_word = "ADP" if src == "ADP" else "ECR"
-    subtitle = f"{len(df)} rookies &middot; keeper cost from FantasyPros {src_word}"
+    subtitle = f"{len(df)} rookies &middot; round cost from FantasyPros {src_word}"
     src_phrase = ("their redraft ADP" if src == "ADP"
                   else "their overall consensus ranking (redraft ADP isn't published yet)")
     intro = (
-        f"<strong>Keeper Rd</strong> is the round you would spend to keep this rookie &mdash; {src_phrase} "
-        f"pushed back {keeper_discount} picks (half-round keeper discount), placed in a {teams}-team draft. "
+        f"<strong>Round Cost</strong> is the round it costs to draft this rookie &mdash; {src_phrase} "
+        f"pushed back {keeper_discount} picks (half-round rookie discount), placed in our {teams}-team, "
+        f"{rounds}-round draft. Anything past round {rounds} is <strong>FA</strong> (free agent &mdash; no pick needed). "
         f"Sorted best value first."
     ) if has_value else (
-        "Ranked by dynasty rookie consensus. Keeper-cost values will appear once FantasyPros publishes "
+        "Ranked by dynasty rookie consensus. Round-cost values will appear once FantasyPros publishes "
         "rankings for this class."
     )
     affected_n = int(df["discount_affects"].sum()) if "discount_affects" in df.columns else 0
     legend = (
         f'<p style="margin:8px 0 0; font-size:0.8rem; color:var(--text-muted);">'
-        f'<span class="disc-key"></span> Highlighted ({affected_n}) = the &frac12;-round discount bumps them '
-        f'to a cheaper keeper round <span class="disc-badge">&#9660;&frac12;</span></p>'
+        f'<span class="disc-key"></span> Highlighted ({affected_n}) = the &frac12;-round rookie discount bumps them '
+        f'to a cheaper round <span class="disc-badge">&#9660;&frac12;</span></p>'
     ) if has_value else ""
 
     return f"""{_head(f"Rookie Values {year}", "Incoming rookie ADP and draft cost")}
@@ -1543,6 +1565,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Values {year}</h1>
         <p class="subtitle">{subtitle}</p>
+        <a class="sheet-link" href="rookie-lottery.html">&#127942; Draft lottery &amp; order &rarr;</a>
     </div>
 
     <div class="section-card" style="padding:14px 16px;">
