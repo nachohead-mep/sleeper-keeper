@@ -950,13 +950,23 @@ function buildFullOrder() {
   el.innerHTML = "";
   ALL_PICKS.forEach((p) => {
     const row = document.createElement("div");
-    row.className = "order-row" + (p.lottery ? " is-lottery" : "");
+    row.className = "order-row" + (p.lottery ? " is-lottery" : "") + (p.from_handle ? " is-traded-row" : "");
     if (p.lottery) row.id = "full-" + p.pick;
-    const team = p.lottery
-      ? '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>'
-      : avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    let team;
+    if (p.lottery) {
+      team = '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>';
+    } else if (p.from_handle) {
+      // Traded pick: original owner &rarr; current owner, colour-coded.
+      team = avatarHtml(p.from_photo, "av-sm av-from") +
+             '<span class="trade-arrow">&rarr;</span>' +
+             avatarHtml(p.photo, "av-sm av-owner") +
+             '<span class="trade-text">' + escapeHtml(p.owner) +
+             ' <span class="trade-from">traded from ' + escapeHtml(p.from_handle) + '</span></span>';
+    } else {
+      team = avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    }
     row.innerHTML = '<span class="order-pick">' + p.pick + '</span>' +
-                    '<span class="order-team">' + team + '</span>';
+                    '<span class="order-team' + (p.from_handle ? ' is-traded' : '') + '">' + team + '</span>';
     el.appendChild(row);
   });
 }
@@ -994,7 +1004,19 @@ function animateRoll(target, dur) {
 }
 
 function buildPermalink(seedStr) {
-  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1";
+  // Shared links are locked: recipients can only watch this one authoritative run.
+  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1&lock=1";
+}
+
+let seedLocked = false;
+function lockSeed(s) {
+  seedLocked = true;
+  $("seed").value = s;
+  $("seed").readOnly = true;
+  $("seed").classList.add("locked");
+  $("runBtn").textContent = "Replay the Official Draw";
+  $("officialBanner").classList.add("show");
+  $("officialSeed").textContent = s;
 }
 
 // How far the drawn number sits from a team's ball-range (0 if inside).
@@ -1008,11 +1030,20 @@ function rangeDistance(roll, t) {
 // others are ranked by how close their range was to the number — closest is
 // saved, next clangs off the crossbar, the rest sky it. Purely cosmetic: the
 // winner is already decided by the provably-fair draw above.
+// Commentary pools per outcome — chosen deterministically from the draw so a
+// shared/locked link shows the same call-outs for everyone.
 const SHOT = {
-  score:    { result: "GOAL!" },
-  saved:    { result: "saved" },
-  crossbar: { result: "off the bar!" },
-  miss:     { result: "missed" },
+  score: ["top corner &mdash; buried it!", "roofs it, no chance!", "slots it bottom corner &mdash; GOAL!",
+          "sends the keeper the wrong way &mdash; scores!", "cool as you like &mdash; buried!",
+          "rifles it home!", "tucked away, top bins!"],
+  saved: ["tipped off the keeper's fingertips &mdash; what a save!", "huge save &mdash; denied!",
+          "the keeper guesses right and stops it!", "stoned by the keeper!", "parried away &mdash; denied!",
+          "full stretch &mdash; what a stop!"],
+  crossbar: ["off the crossbar!", "rattles the woodwork and out!", "off the post &mdash; so close!",
+             "clangs the bar &mdash; no goal!", "inches away &mdash; off the frame!"],
+  miss: ["way off &mdash; into the stands!", "skies it over the bar", "drags it wide of the post",
+         "blazes it over the top", "scuffs it well wide", "slips and slices it miles wide",
+         "wide &mdash; never close"],
 };
 const REVEAL_ORDER = { miss: 0, crossbar: 1, saved: 2, score: 3 };
 
@@ -1044,7 +1075,9 @@ function shootout(remaining, winnerIdx, roll, instant) {
   const settle = ({ ti, row }) => {
     const oc = outcome[ti];
     row.classList.add(oc);
-    row.querySelector(".kicker-result").textContent = SHOT[oc].result;
+    const pool = SHOT[oc];
+    const idx = (((roll == null ? 7 : roll) + ti * 31) % pool.length + pool.length) % pool.length;
+    row.querySelector(".kicker-result").innerHTML = pool[idx];
   };
   if (instant) { rows.forEach(settle); return Promise.resolve(); }
 
@@ -1082,19 +1115,20 @@ async function play(seedStr, instant) {
         ' &rarr; ' + TEAMS[ev.teamIndex].name + ' already drawn &mdash; back in the pot</span>';
       if (!instant) await sleep(950);
     } else {
-      hotSegment(ev.teamIndex);
       const remaining = TEAMS.map((_, i) => i).filter((i) => !placed.has(i));
+      // Don't name the winner yet — let the shootout's goal be the reveal.
       $("rollStatus").innerHTML = ev.auto
-        ? '<strong>' + TEAMS[ev.teamIndex].name + '</strong> is last in the pot &mdash; tap-in for Pick ' + ev.pick
-        : 'Ball ' + ev.roll + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> steps up for Pick ' + ev.pick;
+        ? 'The final kicker steps up for Pick ' + ev.pick + '&hellip;'
+        : 'Ball ' + ev.roll + ' &mdash; the kickers line up for Pick ' + ev.pick + '&hellip;';
       await shootout(remaining, ev.teamIndex, ev.roll, instant);
       placed.add(ev.teamIndex);
+      hotSegment(ev.teamIndex); // reveal on the picker only after the goal
       fillSlot(ev.pick, ev.teamIndex, ev.roll);
       setFullOrder(ev.pick, ev.teamIndex);
+      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
+      if (!instant) await sleep(900);
       $("seg-" + ev.teamIndex).classList.add("dim");
       hotSegment(-1); // clear the highlight now that they're out of the pool
-      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
-      if (!instant) await sleep(1100);
     }
   }
   hotSegment(-1);
@@ -1141,7 +1175,10 @@ function randomSeed() {
 buildBar(); buildBoard(); buildFullOrder();
 $("runBtn").addEventListener("click", () => {
   let s = $("seed").value.trim();
-  if (!s) { s = randomSeed(); $("seed").value = s; }
+  if (!s) {
+    if (seedLocked) return;
+    s = randomSeed(); $("seed").value = s;
+  }
   play(s, $("instant").checked);
 });
 $("permalink").addEventListener("click", () => {
@@ -1175,8 +1212,9 @@ document.addEventListener("keydown", (e) => {
 
 const params = new URLSearchParams(location.search);
 if (params.get("seed")) {
-  $("seed").value = params.get("seed");
-  if (params.get("run")) play(params.get("seed"), false);
+  const s = params.get("seed");
+  if (params.get("lock")) lockSeed(s); else $("seed").value = s;
+  if (params.get("run")) play(s, false);
 }
 """
 
@@ -1215,11 +1253,22 @@ def generate_lottery(pick_rows, year, sheet_id):
 </div>
 </body></html>"""
 
+    import re
     all_picks = _parse_all_picks(pick_rows)
     for p in all_picks:
-        # Lottery slots stay generic placeholders (filled by the draw); non-lottery
-        # picks carry their owner's headshot.
-        p["photo"] = "" if p["lottery"] else _photo_url(_owner_handle(p["team"]), available)
+        # Lottery slots stay generic placeholders (filled by the draw).
+        if p["lottery"]:
+            p["photo"] = ""
+            p["owner"] = ""
+            p["from_handle"] = ""
+            p["from_photo"] = ""
+            continue
+        owner = _owner_handle(p["team"])
+        m = re.search(r"\(from\s+([^)]+)\)", p["team"])
+        p["owner"] = owner
+        p["photo"] = _photo_url(owner, available)             # current owner
+        p["from_handle"] = m.group(1).strip() if m else ""    # original owner (traded)
+        p["from_photo"] = _photo_url(p["from_handle"], available) if m else ""
     js = (LOTTERY_JS
           .replace("__TEAMS__", json.dumps(teams))
           .replace("__PICKS__", json.dumps(all_picks)))
@@ -1251,6 +1300,10 @@ def generate_lottery(pick_rows, year, sheet_id):
 
     <div class="section-card">
         <h2>&#127942; The Draw</h2>
+        <div class="official-banner" id="officialBanner">
+            &#128274; Official draw &mdash; locked seed <code id="officialSeed"></code>.
+            Anyone with this link sees this exact result.
+        </div>
         <div class="seed-controls">
             <input id="seed" placeholder="Enter the agreed-upon public seed (e.g. MNF-total-47)">
             <label class="toggle-label"><input type="checkbox" id="instant"> instant</label>
