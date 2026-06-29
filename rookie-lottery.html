@@ -130,6 +130,10 @@
 
     <div class="section-card">
         <h2>&#127942; The Draw</h2>
+        <div class="official-banner" id="officialBanner">
+            &#128274; Official draw &mdash; locked seed <code id="officialSeed"></code>.
+            Anyone with this link sees this exact result.
+        </div>
         <div class="seed-controls">
             <input id="seed" placeholder="Enter the agreed-upon public seed (e.g. MNF-total-47)">
             <label class="toggle-label"><input type="checkbox" id="instant"> instant</label>
@@ -196,7 +200,7 @@
 <script>
 
 const TEAMS = [{"name": "DannyN", "label": "Consolation Runner Up", "lo": 1, "hi": 30, "weight": 30, "color": "#3b82f6", "cc": "", "photo": "photos/DannyN.png"}, {"name": "zachmassey", "label": "Consolation 3rd", "lo": 31, "hi": 55, "weight": 25, "color": "#10b981", "cc": "", "photo": "photos/zachmassey.png"}, {"name": "jpersily", "label": "Consolation 4th", "lo": 56, "hi": 75, "weight": 20, "color": "#f59e0b", "cc": "", "photo": "photos/jpersily.png"}, {"name": "jaw7475", "label": "Consolation 5th", "lo": 76, "hi": 90, "weight": 15, "color": "#ef4444", "cc": "", "photo": "photos/jaw7475.png"}, {"name": "JoshWasserman", "label": "Consolation 6th/Sacko", "lo": 91, "hi": 100, "weight": 10, "color": "#a855f7", "cc": "", "photo": "photos/JoshWasserman.png"}];
-const ALL_PICKS = [{"pick": "1", "team": "JoshWasserman (from spencerrubin7)", "lottery": false, "photo": "photos/JoshWasserman.png"}, {"pick": "2", "team": "LOTTERY (30% DannyN)", "lottery": true, "photo": ""}, {"pick": "3", "team": "LOTTERY (25% zachmassey)", "lottery": true, "photo": ""}, {"pick": "4", "team": "LOTTERY (20% jpersily)", "lottery": true, "photo": ""}, {"pick": "5", "team": "LOTTERY (15% jaw7475)", "lottery": true, "photo": ""}, {"pick": "6", "team": "LOTTERY (10% JoshWasserman)", "lottery": true, "photo": ""}, {"pick": "7", "team": "Gohrdo", "lottery": false, "photo": "photos/Gohrdo.png"}, {"pick": "8", "team": "zachjd5", "lottery": false, "photo": "photos/zachjd5.png"}, {"pick": "9", "team": "JoshWasserman (from dbleykhman)", "lottery": false, "photo": "photos/JoshWasserman.png"}, {"pick": "10", "team": "Friedo", "lottery": false, "photo": "photos/Friedo.png"}, {"pick": "11", "team": "ashanes", "lottery": false, "photo": "photos/ashanes.png"}, {"pick": "12", "team": "skippo", "lottery": false, "photo": "photos/skippo.png"}];  // full 1-N order; lottery slots get filled by the draw
+const ALL_PICKS = [{"pick": "1", "team": "JoshWasserman (from spencerrubin7)", "lottery": false, "owner": "JoshWasserman", "photo": "photos/JoshWasserman.png", "from_handle": "spencerrubin7", "from_photo": "photos/spencerrubin7.png"}, {"pick": "2", "team": "LOTTERY (30% DannyN)", "lottery": true, "photo": "", "owner": "", "from_handle": "", "from_photo": ""}, {"pick": "3", "team": "LOTTERY (25% zachmassey)", "lottery": true, "photo": "", "owner": "", "from_handle": "", "from_photo": ""}, {"pick": "4", "team": "LOTTERY (20% jpersily)", "lottery": true, "photo": "", "owner": "", "from_handle": "", "from_photo": ""}, {"pick": "5", "team": "LOTTERY (15% jaw7475)", "lottery": true, "photo": "", "owner": "", "from_handle": "", "from_photo": ""}, {"pick": "6", "team": "LOTTERY (10% JoshWasserman)", "lottery": true, "photo": "", "owner": "", "from_handle": "", "from_photo": ""}, {"pick": "7", "team": "Gohrdo", "lottery": false, "owner": "Gohrdo", "photo": "photos/Gohrdo.png", "from_handle": "", "from_photo": ""}, {"pick": "8", "team": "zachjd5", "lottery": false, "owner": "zachjd5", "photo": "photos/zachjd5.png", "from_handle": "", "from_photo": ""}, {"pick": "9", "team": "JoshWasserman (from dbleykhman)", "lottery": false, "owner": "JoshWasserman", "photo": "photos/JoshWasserman.png", "from_handle": "dbleykhman", "from_photo": "photos/dbleykhman.png"}, {"pick": "10", "team": "Friedo", "lottery": false, "owner": "Friedo", "photo": "photos/Friedo.png", "from_handle": "", "from_photo": ""}, {"pick": "11", "team": "ashanes", "lottery": false, "owner": "ashanes", "photo": "photos/ashanes.png", "from_handle": "", "from_photo": ""}, {"pick": "12", "team": "skippo", "lottery": false, "owner": "skippo", "photo": "photos/skippo.png", "from_handle": "", "from_photo": ""}];  // full 1-N order; lottery slots get filled by the draw
 
 // ── Deterministic PRNG (seed string -> reproducible stream) ──────────
 function cyrb53(str, seed) {
@@ -309,13 +313,23 @@ function buildFullOrder() {
   el.innerHTML = "";
   ALL_PICKS.forEach((p) => {
     const row = document.createElement("div");
-    row.className = "order-row" + (p.lottery ? " is-lottery" : "");
+    row.className = "order-row" + (p.lottery ? " is-lottery" : "") + (p.from_handle ? " is-traded-row" : "");
     if (p.lottery) row.id = "full-" + p.pick;
-    const team = p.lottery
-      ? '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>'
-      : avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    let team;
+    if (p.lottery) {
+      team = '<span class="order-pending">&#127922; lottery slot <span class="lottery-tag">to be drawn</span></span>';
+    } else if (p.from_handle) {
+      // Traded pick: original owner &rarr; current owner, colour-coded.
+      team = avatarHtml(p.from_photo, "av-sm av-from") +
+             '<span class="trade-arrow">&rarr;</span>' +
+             avatarHtml(p.photo, "av-sm av-owner") +
+             '<span class="trade-text">' + escapeHtml(p.owner) +
+             ' <span class="trade-from">traded from ' + escapeHtml(p.from_handle) + '</span></span>';
+    } else {
+      team = avatarHtml(p.photo, "av-sm") + escapeHtml(p.team);
+    }
     row.innerHTML = '<span class="order-pick">' + p.pick + '</span>' +
-                    '<span class="order-team">' + team + '</span>';
+                    '<span class="order-team' + (p.from_handle ? ' is-traded' : '') + '">' + team + '</span>';
     el.appendChild(row);
   });
 }
@@ -353,7 +367,19 @@ function animateRoll(target, dur) {
 }
 
 function buildPermalink(seedStr) {
-  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1";
+  // Shared links are locked: recipients can only watch this one authoritative run.
+  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1&lock=1";
+}
+
+let seedLocked = false;
+function lockSeed(s) {
+  seedLocked = true;
+  $("seed").value = s;
+  $("seed").readOnly = true;
+  $("seed").classList.add("locked");
+  $("runBtn").textContent = "Replay the Official Draw";
+  $("officialBanner").classList.add("show");
+  $("officialSeed").textContent = s;
 }
 
 // How far the drawn number sits from a team's ball-range (0 if inside).
@@ -367,11 +393,20 @@ function rangeDistance(roll, t) {
 // others are ranked by how close their range was to the number — closest is
 // saved, next clangs off the crossbar, the rest sky it. Purely cosmetic: the
 // winner is already decided by the provably-fair draw above.
+// Commentary pools per outcome — chosen deterministically from the draw so a
+// shared/locked link shows the same call-outs for everyone.
 const SHOT = {
-  score:    { result: "GOAL!" },
-  saved:    { result: "saved" },
-  crossbar: { result: "off the bar!" },
-  miss:     { result: "missed" },
+  score: ["top corner &mdash; buried it!", "roofs it, no chance!", "slots it bottom corner &mdash; GOAL!",
+          "sends the keeper the wrong way &mdash; scores!", "cool as you like &mdash; buried!",
+          "rifles it home!", "tucked away, top bins!"],
+  saved: ["tipped off the keeper's fingertips &mdash; what a save!", "huge save &mdash; denied!",
+          "the keeper guesses right and stops it!", "stoned by the keeper!", "parried away &mdash; denied!",
+          "full stretch &mdash; what a stop!"],
+  crossbar: ["off the crossbar!", "rattles the woodwork and out!", "off the post &mdash; so close!",
+             "clangs the bar &mdash; no goal!", "inches away &mdash; off the frame!"],
+  miss: ["way off &mdash; into the stands!", "skies it over the bar", "drags it wide of the post",
+         "blazes it over the top", "scuffs it well wide", "slips and slices it miles wide",
+         "wide &mdash; never close"],
 };
 const REVEAL_ORDER = { miss: 0, crossbar: 1, saved: 2, score: 3 };
 
@@ -403,7 +438,9 @@ function shootout(remaining, winnerIdx, roll, instant) {
   const settle = ({ ti, row }) => {
     const oc = outcome[ti];
     row.classList.add(oc);
-    row.querySelector(".kicker-result").textContent = SHOT[oc].result;
+    const pool = SHOT[oc];
+    const idx = (((roll == null ? 7 : roll) + ti * 31) % pool.length + pool.length) % pool.length;
+    row.querySelector(".kicker-result").innerHTML = pool[idx];
   };
   if (instant) { rows.forEach(settle); return Promise.resolve(); }
 
@@ -441,19 +478,20 @@ async function play(seedStr, instant) {
         ' &rarr; ' + TEAMS[ev.teamIndex].name + ' already drawn &mdash; back in the pot</span>';
       if (!instant) await sleep(950);
     } else {
-      hotSegment(ev.teamIndex);
       const remaining = TEAMS.map((_, i) => i).filter((i) => !placed.has(i));
+      // Don't name the winner yet — let the shootout's goal be the reveal.
       $("rollStatus").innerHTML = ev.auto
-        ? '<strong>' + TEAMS[ev.teamIndex].name + '</strong> is last in the pot &mdash; tap-in for Pick ' + ev.pick
-        : 'Ball ' + ev.roll + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> steps up for Pick ' + ev.pick;
+        ? 'The final kicker steps up for Pick ' + ev.pick + '&hellip;'
+        : 'Ball ' + ev.roll + ' &mdash; the kickers line up for Pick ' + ev.pick + '&hellip;';
       await shootout(remaining, ev.teamIndex, ev.roll, instant);
       placed.add(ev.teamIndex);
+      hotSegment(ev.teamIndex); // reveal on the picker only after the goal
       fillSlot(ev.pick, ev.teamIndex, ev.roll);
       setFullOrder(ev.pick, ev.teamIndex);
+      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
+      if (!instant) await sleep(900);
       $("seg-" + ev.teamIndex).classList.add("dim");
       hotSegment(-1); // clear the highlight now that they're out of the pool
-      $("rollStatus").innerHTML = '&#9917; Pick ' + ev.pick + ' &rarr; <strong>' + TEAMS[ev.teamIndex].name + '</strong> scores!';
-      if (!instant) await sleep(1100);
     }
   }
   hotSegment(-1);
@@ -500,7 +538,10 @@ function randomSeed() {
 buildBar(); buildBoard(); buildFullOrder();
 $("runBtn").addEventListener("click", () => {
   let s = $("seed").value.trim();
-  if (!s) { s = randomSeed(); $("seed").value = s; }
+  if (!s) {
+    if (seedLocked) return;
+    s = randomSeed(); $("seed").value = s;
+  }
   play(s, $("instant").checked);
 });
 $("permalink").addEventListener("click", () => {
@@ -534,8 +575,9 @@ document.addEventListener("keydown", (e) => {
 
 const params = new URLSearchParams(location.search);
 if (params.get("seed")) {
-  $("seed").value = params.get("seed");
-  if (params.get("run")) play(params.get("seed"), false);
+  const s = params.get("seed");
+  if (params.get("lock")) lockSeed(s); else $("seed").value = s;
+  if (params.get("run")) play(s, false);
 }
 
 </script>
