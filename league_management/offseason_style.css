@@ -167,6 +167,14 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
 }
 .data-table tr.ineligible td:first-child { font-style: italic; }
 
+/* ── Rookie values: half-round discount highlight ─────────── */
+.data-table tr.discount-affected td { background: rgba(232, 185, 35, 0.12); }
+.disc-badge { color: var(--wc-gold); font-size: 0.72rem; margin-left: 4px; font-weight: 700; white-space: nowrap; }
+.disc-key {
+    display: inline-block; width: 12px; height: 12px; border-radius: 3px;
+    background: rgba(232, 185, 35, 0.45); vertical-align: middle; margin-right: 5px;
+}
+
 /* ── Rookie draft table ───────────────────────────────────── */
 .draft-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .draft-table th {

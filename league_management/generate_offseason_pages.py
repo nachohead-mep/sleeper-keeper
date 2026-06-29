@@ -1447,6 +1447,10 @@ def _rookie_values_df(year, teams=12, keeper_discount=6):
         discounted = df["value_pick"] + keeper_discount
         df["discounted_pick"] = discounted.round(0)
         df["rookie_cost_round"] = ((discounted - 1) // teams + 1).astype("Int64")
+        # The discount only "matters" when it bumps a player to a cheaper round
+        # vs. their undiscounted value (i.e. value sits in the back half of a round).
+        raw_round = ((df["value_pick"] - 1) // teams + 1).astype("Int64")
+        df["discount_affects"] = (df["rookie_cost_round"] > raw_round).fillna(False)
 
         df = df.sort_values("value_pick", na_position="last").drop(columns="player_id")
         return df.reset_index(drop=True)
@@ -1484,7 +1488,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
         src = df.loc[df["value_source"].astype(bool), "value_source"].iloc[0]
     val_label = "ADP" if src == "ADP" else "Overall #"
 
-    def _val_cells(row):
+    def _val_cells(row, affected):
         if not has_value:
             return ""
         vp = getattr(row, "value_pick", None)
@@ -1494,15 +1498,19 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
             cost_txt = "&mdash;" if cost is None or (isinstance(cost, float) and math.isnan(cost)) else f"Rd {int(cost)}"
         except (ValueError, TypeError):
             cost_txt = "&mdash;"
+        if affected and cost_txt != "&mdash;":
+            cost_txt += ' <span class="disc-badge" title="The half-round discount drops them to a cheaper round">&#9660;&frac12;</span>'
         return f'<td>{vp_txt}</td><td><strong>{cost_txt}</strong></td>'
 
     rows_html = ""
     for i, row in enumerate(df.itertuples(index=False), start=1):
         pos = _escape(getattr(row, "position", ""))
-        rows_html += (f'<tr data-pos="{pos}"><td>{i}</td>'
+        affected = bool(getattr(row, "discount_affects", False))
+        cls = ' class="discount-affected"' if affected else ""
+        rows_html += (f'<tr data-pos="{pos}"{cls}><td>{i}</td>'
                       f'<td>{_escape(getattr(row, "player_name", ""))}</td>'
                       f'<td>{pos}</td><td>{_escape(getattr(row, "team", ""))}</td>'
-                      f'{_val_cells(row)}</tr>\n')
+                      f'{_val_cells(row, affected)}</tr>\n')
 
     adp_head = (
         f'<th data-col="4" data-num="1">{val_label} <span class="sort-arrow"></span></th>'
@@ -1520,6 +1528,12 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
         "Ranked by dynasty rookie consensus. Keeper-cost values will appear once FantasyPros publishes "
         "rankings for this class."
     )
+    affected_n = int(df["discount_affects"].sum()) if "discount_affects" in df.columns else 0
+    legend = (
+        f'<p style="margin:8px 0 0; font-size:0.8rem; color:var(--text-muted);">'
+        f'<span class="disc-key"></span> Highlighted ({affected_n}) = the &frac12;-round discount bumps them '
+        f'to a cheaper keeper round <span class="disc-badge">&#9660;&frac12;</span></p>'
+    ) if has_value else ""
 
     return f"""{_head(f"Rookie Values {year}", "Incoming rookie ADP and draft cost")}
 <body>
@@ -1533,6 +1547,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6):
 
     <div class="section-card" style="padding:14px 16px;">
         <p style="color:var(--text-secondary); font-size:0.85rem; margin:0;">{intro}</p>
+        {legend}
     </div>
 
     <div class="filter-bar">
