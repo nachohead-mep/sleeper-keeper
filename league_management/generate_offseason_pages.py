@@ -1004,8 +1004,8 @@ function animateRoll(target, dur) {
 }
 
 function buildPermalink(seedStr) {
-  // Shared links are locked: recipients can only watch this one authoritative run.
-  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&run=1&lock=1";
+  // Locked link, but no auto-start — the recipient presses play when ready.
+  return location.origin + location.pathname + "?seed=" + encodeURIComponent(seedStr) + "&lock=1";
 }
 
 let seedLocked = false;
@@ -1014,9 +1014,13 @@ function lockSeed(s) {
   $("seed").value = s;
   $("seed").readOnly = true;
   $("seed").classList.add("locked");
-  $("runBtn").textContent = "Replay the Official Draw";
+  $("runBtn").textContent = "Watch the Official Draw";
+  $("rollStatus").innerHTML = 'Press <strong>Watch the Official Draw</strong> when ready.';
   $("officialBanner").classList.add("show");
   $("officialSeed").textContent = s;
+}
+function showPractice() {
+  $("practiceBanner").classList.add("show");
 }
 
 // How far the drawn number sits from a team's ball-range (0 if inside).
@@ -1134,7 +1138,8 @@ async function play(seedStr, instant) {
   hotSegment(-1);
   $("pitch").style.display = "none";
   $("rollStatus").innerHTML = '&#127942; <span style="color:var(--accent-green)">The draw is complete &mdash; reproducible from the seed above.</span>';
-  $("runBtn").disabled = false; $("runBtn").textContent = "Draw Again";
+  $("runBtn").disabled = false;
+  $("runBtn").textContent = seedLocked ? "Watch Again" : "Draw Again";
   animating = false;
 }
 
@@ -1211,10 +1216,11 @@ document.addEventListener("keydown", (e) => {
 });
 
 const params = new URLSearchParams(location.search);
+if (params.get("practice")) showPractice();
 if (params.get("seed")) {
   const s = params.get("seed");
   if (params.get("lock")) lockSeed(s); else $("seed").value = s;
-  if (params.get("run")) play(s, false);
+  if (params.get("run")) play(s, false); // opt-in only; shared links no longer auto-start
 }
 """
 
@@ -1274,43 +1280,47 @@ def generate_lottery(pick_rows, year, sheet_id):
           .replace("__PICKS__", json.dumps(all_picks)))
     first_pick = len(teams) + 1  # picks 2 .. (n+1)
 
-    return f"""{_head(f"Rookie Draft Lottery {year}", "Provably-fair World Cup draw for the rookie draft")}
+    return f"""{_head(f"Rookie Draft Lottery {year}", "World Cup-style weighted lottery for the rookie draft")}
 <body class="wc-theme">
 {_nav()}
 <div class="container-narrow">
     <div class="page-header wc-header">
         <div class="page-header-icon">&#127942;</div>
         <h1>The Draw {year}</h1>
-        <p class="subtitle">Weighted ball draw for picks 2&ndash;{first_pick} &middot; provably fair</p>
+        <p class="subtitle">Weighted lottery for rookie draft picks 2&ndash;{first_pick}</p>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
     <div class="section-card lottery-intro">
-        <h2>&#9917; How the draw works</h2>
+        <h2>&#9917; How it works</h2>
         <ol>
-            <li>Before the draw, everyone agrees on a <strong>public seed</strong> &mdash; e.g. the combined
-                score of a chosen match, a future block hash, anything nobody can predict or control.</li>
-            <li>The seed feeds a deterministic generator (visible in this page's source) that fills a pot with
-                <strong>100 balls</strong> split by each nation's odds, then <strong>draws one ball at a time</strong>,
-                returning any nation already placed to the pot, until picks 2&ndash;{first_pick} are set.</li>
-            <li>Same seed &rarr; same draw, every time. Anyone can re-run it and verify. Nobody, including
-                the commissioner, can rig it.</li>
+            <li>The consolation-bracket teams are in the lottery for picks 2&ndash;{first_pick}. The better the
+                consolation finish, the better the odds at the top pick &mdash; see the pot below.</li>
+            <li>It's a <strong>1&ndash;100 draw</strong>: each team owns a slice of numbers sized to its odds.
+                We draw a number, whoever's slice it lands in takes the next pick, then draw again (skipping anyone
+                already in) until the order is set.</li>
+            <li>The whole draw runs off one agreed-upon starting number, so it plays out the same for everyone and
+                can be replayed. Want to sanity-check the odds? Hit <strong>Verify the odds</strong> at the bottom.</li>
         </ol>
     </div>
 
     <div class="section-card">
         <h2>&#127942; The Draw</h2>
         <div class="official-banner" id="officialBanner">
-            &#128274; Official draw &mdash; locked seed <code id="officialSeed"></code>.
-            Anyone with this link sees this exact result.
+            <div>&#128274; This is the <strong>official draw</strong> (seed <code id="officialSeed"></code>).
+            Press <strong>Watch the Official Draw</strong> when you're ready &mdash; everyone with this link sees the same result.</div>
+            <a class="practice-link" href="?practice=1" target="_blank" rel="noopener">&#129514; Open a practice run to try other seeds &rarr;</a>
+        </div>
+        <div class="practice-banner" id="practiceBanner">
+            &#129514; <strong>Practice run.</strong> Enter any seed and draw to see how it could play out &mdash; this isn't the official result.
         </div>
         <div class="seed-controls">
-            <input id="seed" placeholder="Enter the agreed-upon public seed (e.g. MNF-total-47)">
+            <input id="seed" placeholder="Agreed-upon starting number (e.g. MNF-total-47)">
             <label class="toggle-label"><input type="checkbox" id="instant"> instant</label>
             <button class="btn" id="runBtn">Begin the Draw</button>
         </div>
         <div class="seed-note">
-            Leave blank to generate a random seed (fine for a test run; agree on a public seed for the real draw).
+            Leave blank for a random one (fine for a test run). For the real draw, agree on a number first.
             Seed used: <span class="seed-shown" id="seedShown">&mdash;</span>
         </div>
         <div class="permalink-box" id="permaBox" style="display:none">
