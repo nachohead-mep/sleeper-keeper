@@ -37,6 +37,18 @@ APPS_SCRIPT_PROPOSALS_URL = APPS_SCRIPT_URL + "?action=proposals" if APPS_SCRIPT
 
 PAGES_BASE_URL = os.environ.get("PAGES_BASE_URL", "https://nachohead-mep.github.io/sleeper-keeper")
 
+# Official lottery seed. When set, internal links point to the locked, authoritative
+# draw (rookie-lottery.html?seed=...&lock=1) instead of the general, unlocked page.
+LOTTERY_SEED = os.environ.get("LOTTERY_SEED", "")
+
+
+def _lottery_url():
+    from urllib.parse import quote
+    if LOTTERY_SEED:
+        return f"rookie-lottery.html?seed={quote(LOTTERY_SEED)}&amp;lock=1"
+    return "rookie-lottery.html"
+
+
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Read SVG logo and prepare inline versions
@@ -225,7 +237,7 @@ def generate_landing(year, sheet_id):
             <h2>Rookie Draft</h2>
             <p>Pick order, lottery odds, and traded picks for {year}.</p>
         </a>
-        <a class="landing-card" href="rookie-lottery.html">
+        <a class="landing-card" href="{_lottery_url()}">
             <div class="card-icon">&#9917;</div>
             <h2>The Draw</h2>
             <p>World Cup&ndash;style weighted lottery for picks 2&ndash;6. Run it live and verify the odds.</p>
@@ -714,7 +726,7 @@ def generate_rookie_draft(pick_rows, year, sheet_id):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Draft {year}</h1>
         <p class="subtitle">Pick order &middot; Lottery odds &middot; Trade notes</p>
-        <a class="sheet-link" href="rookie-lottery.html">&#127942; Run the Draft Lottery</a>
+        <a class="sheet-link" href="{_lottery_url()}">&#127942; Run the Draft Lottery</a>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -1447,12 +1459,12 @@ def _rookie_values_df(year, teams=12, keeper_discount=6, rounds=16):
         discounted = df["value_pick"] + keeper_discount
         df["discounted_pick"] = discounted.round(0)
         df["rookie_cost_round"] = ((discounted - 1) // teams + 1).astype("Int64")
-        # The discount only "matters" when it bumps a player to a cheaper round
-        # vs. their undiscounted value — and only if they were draftable to begin
-        # with (a player already past the last round is a free agent either way).
+        # The discount only "matters" when it bumps a player to a cheaper round.
+        # Compare on rounds capped at the last round, so a player already at (or
+        # past) round 16 — whose cost is locked at 16 — doesn't count.
         raw_round = (df["value_pick"] - 1) // teams + 1
         df["discount_affects"] = (
-            (df["rookie_cost_round"] > raw_round) & (raw_round <= rounds)
+            df["rookie_cost_round"].clip(upper=rounds) > raw_round.clip(upper=rounds)
         ).fillna(False)
 
         df = df.sort_values("value_pick", na_position="last").drop(columns="player_id")
@@ -1477,7 +1489,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Values {year}</h1>
         <p class="subtitle">Incoming rookie class</p>
-        <a class="sheet-link" href="rookie-lottery.html">&#127942; Draft lottery &amp; order &rarr;</a>
+        <a class="sheet-link" href="{_lottery_url()}">&#127942; Draft lottery &amp; order &rarr;</a>
     </div>
     {body}
 </div>
@@ -1494,13 +1506,13 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
 
     def _round_pick(n):
         """Overall pick number -> 'round.pick (overall)', e.g. 14 -> '2.02 (14)'.
-        Past the last round it's beyond the draft, so show FA (free agent)."""
+        Past the last round, lock to the final round (e.g. '16+ (200)')."""
         if n is None or (isinstance(n, float) and math.isnan(n)):
             return "&mdash;"
         n = int(round(n))
         rnd = (n - 1) // teams + 1
         if rnd > rounds:
-            return f"FA ({n})"
+            return f"{rounds}+ ({n})"
         pk = (n - 1) % teams + 1
         return f"{rnd}.{pk:02d} ({n})"
 
@@ -1513,10 +1525,8 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
         try:
             if cost is None or (isinstance(cost, float) and math.isnan(cost)):
                 cost_txt = "&mdash;"
-            elif int(cost) > rounds:
-                cost_txt = "FA"  # beyond the last round — no pick needed
             else:
-                cost_txt = f"Rd {int(cost)}"
+                cost_txt = f"Rd {min(int(cost), rounds)}"  # locked at the last round
         except (ValueError, TypeError):
             cost_txt = "&mdash;"
         if affected and cost_txt != "&mdash;":
@@ -1544,7 +1554,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
     intro = (
         f"<strong>Round Cost</strong> is the round it costs to draft this rookie &mdash; {src_phrase} "
         f"pushed back {keeper_discount} picks (half-round rookie discount), placed in our {teams}-team, "
-        f"{rounds}-round draft. Anything past round {rounds} is <strong>FA</strong> (free agent &mdash; no pick needed). "
+        f"{rounds}-round draft. Anything past round {rounds} locks to a last-round ({rounds}) pick. "
         f"Sorted best value first."
     ) if has_value else (
         "Ranked by dynasty rookie consensus. Round-cost values will appear once FantasyPros publishes "
@@ -1565,7 +1575,7 @@ def generate_rookie_values(df, year, teams=12, keeper_discount=6, rounds=16):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Rookie Values {year}</h1>
         <p class="subtitle">{subtitle}</p>
-        <a class="sheet-link" href="rookie-lottery.html">&#127942; Draft lottery &amp; order &rarr;</a>
+        <a class="sheet-link" href="{_lottery_url()}">&#127942; Draft lottery &amp; order &rarr;</a>
     </div>
 
     <div class="section-card" style="padding:14px 16px;">

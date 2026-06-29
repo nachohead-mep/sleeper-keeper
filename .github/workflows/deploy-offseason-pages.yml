@@ -37,6 +37,7 @@ jobs:
           SLEEPER_LEAGUE_NAME: ${{ secrets.SLEEPER_LEAGUE_NAME }}
           SLEEPER_MEMBER_USER_ID: ${{ secrets.SLEEPER_MEMBER_USER_ID }}
           PAGES_BASE_URL: ${{ vars.PAGES_BASE_URL }}
+          LOTTERY_SEED: ${{ vars.LOTTERY_SEED }}
         run: |
           YEAR="${{ github.event.inputs.year }}"
           if [ -z "$YEAR" ]; then
