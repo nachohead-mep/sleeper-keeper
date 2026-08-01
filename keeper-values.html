@@ -200,11 +200,11 @@
 </svg>
 </div>
         <h1>Keeper Values 2026</h1>
-        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible &middot; <span class="review-badge-inline">&#9888; 35 flagged for manual review</span></p>
+        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible &middot; <span class="review-badge-inline">&#9888; 1 flagged for manual review</span></p>
         <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet. &#9888; review rows were continuously rostered (never dropped) long enough that history
-            <em>might</em> mean an unflagged keeper was missed &mdash; verify against real history before trusting the count,
-            continuous rostering alone doesn't prove a discount was exercised.</p>
+            Selections sheet. &#9888; review rows have a draft-round history that matches the keeper-discount formula
+            exactly every year even though is_keeper was never flagged &mdash; a strong signal (not just "never dropped")
+            that a keep was missed. Verify against real history before correcting the count.</p>
         <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -243,7 +243,7 @@
             <th data-col="9">Review <span class="sort-arrow"></span></th>
         </tr></thead>
         <tbody>
-<tr class="needs-review" data-team="DannyN" data-eligible="true">
+<tr data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>DJ Moore</td>
     <td>WR</td>
@@ -253,7 +253,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>Jaxon Smith-Njigba</td>
@@ -452,7 +452,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+</tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Lamar Jackson</td>
     <td>QB</td>
@@ -462,7 +462,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Drake London</td>
@@ -473,8 +473,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+    <td><span class="review-badge" title="Draft round history matches the keeper-discount formula exactly every year -- times_kept is likely 3 (&gt;= max of 3), but is_keeper was never flagged. Verify against real history before correcting.">&#9888; review</span></td>
+</tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>George Pickens</td>
     <td>WR</td>
@@ -484,8 +484,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+    <td></td>
+</tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Deebo Samuel</td>
     <td>WR</td>
@@ -495,7 +495,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>4</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
     <td>Friedo</td>
     <td>Josh Downs</td>
@@ -507,7 +507,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+</tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Brian Robinson</td>
     <td>RB</td>
@@ -517,7 +517,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>6</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Emeka Egbuka</td>
@@ -628,7 +628,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Gohrdo" data-eligible="true">
+</tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>DK Metcalf</td>
     <td>WR</td>
@@ -638,7 +638,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Terry McLaurin</td>
@@ -650,7 +650,7 @@
     <td>1</td>
     <td><strong>1</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Gohrdo" data-eligible="true">
+</tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Jaylen Waddle</td>
     <td>WR</td>
@@ -660,8 +660,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="Gohrdo" data-eligible="true">
+    <td></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Cooper Kupp</td>
     <td>WR</td>
@@ -671,7 +671,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>4</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>De'Von Achane</td>
@@ -683,7 +683,7 @@
     <td>2</td>
     <td><strong>3</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Gohrdo" data-eligible="true">
+</tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Rhamondre Stevenson</td>
     <td>RB</td>
@@ -693,8 +693,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>7</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="Gohrdo" data-eligible="true">
+    <td></td>
+</tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Justin Herbert</td>
     <td>QB</td>
@@ -704,7 +704,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>8</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="Gohrdo" data-eligible="true">
     <td>Gohrdo</td>
     <td>Quinshon Judkins</td>
@@ -804,7 +804,7 @@
     <td>0</td>
     <td><strong>11</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="JoshWasserman" data-eligible="true">
+</tr><tr data-team="JoshWasserman" data-eligible="true">
     <td>JoshWasserman</td>
     <td>Kenneth Walker</td>
     <td>RB</td>
@@ -814,7 +814,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="JoshWasserman" data-eligible="true">
     <td>JoshWasserman</td>
     <td>TreVeyon Henderson</td>
@@ -1002,7 +1002,7 @@
     <td>1</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="ashanes" data-eligible="true">
+</tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Breece Hall</td>
     <td>RB</td>
@@ -1012,7 +1012,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Ladd McConkey</td>
@@ -1035,7 +1035,7 @@
     <td>0</td>
     <td><strong>7</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="ashanes" data-eligible="true">
+</tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Michael Pittman</td>
     <td>WR</td>
@@ -1045,7 +1045,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>8</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Rashee Rice</td>
@@ -1068,7 +1068,7 @@
     <td>0</td>
     <td><strong>10</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="ashanes" data-eligible="true">
+</tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Keenan Allen</td>
     <td>WR</td>
@@ -1078,7 +1078,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>11</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Caleb Williams</td>
@@ -1178,7 +1178,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="dbleykhman" data-eligible="true">
+</tr><tr data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>A.J. Brown</td>
     <td>WR</td>
@@ -1188,8 +1188,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="dbleykhman" data-eligible="true">
+    <td></td>
+</tr><tr data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>D'Andre Swift</td>
     <td>RB</td>
@@ -1199,7 +1199,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>Garrett Wilson</td>
@@ -1541,7 +1541,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="jpersily" data-eligible="true">
+</tr><tr data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>David Montgomery</td>
     <td>RB</td>
@@ -1551,8 +1551,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="jpersily" data-eligible="true">
+    <td></td>
+</tr><tr data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>Patrick Mahomes</td>
     <td>QB</td>
@@ -1562,8 +1562,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="jpersily" data-eligible="true">
+    <td></td>
+</tr><tr data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>T.J. Hockenson</td>
     <td>TE</td>
@@ -1573,7 +1573,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>Jakobi Meyers</td>
@@ -1761,7 +1761,7 @@
     <td>0</td>
     <td><strong>1</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="skippo" data-eligible="true">
+</tr><tr data-team="skippo" data-eligible="true">
     <td>skippo</td>
     <td>George Kittle</td>
     <td>TE</td>
@@ -1771,7 +1771,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="skippo" data-eligible="true">
     <td>skippo</td>
     <td>Davante Adams</td>
@@ -1937,7 +1937,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="spencerrubin7" data-eligible="true">
+</tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Alvin Kamara</td>
     <td>RB</td>
@@ -1947,8 +1947,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="spencerrubin7" data-eligible="true">
+    <td></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Jonathan Taylor</td>
     <td>RB</td>
@@ -1958,7 +1958,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Omarion Hampton</td>
@@ -1970,7 +1970,7 @@
     <td>0</td>
     <td><strong>2</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="spencerrubin7" data-eligible="true">
+</tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Aaron Jones</td>
     <td>RB</td>
@@ -1980,8 +1980,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="spencerrubin7" data-eligible="true">
+    <td></td>
+</tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>DeVonta Smith</td>
     <td>WR</td>
@@ -1991,7 +1991,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Baker Mayfield</td>
@@ -2124,7 +2124,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
+</tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Tee Higgins</td>
     <td>WR</td>
@@ -2134,7 +2134,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Malik Nabers</td>
@@ -2146,7 +2146,7 @@
     <td>1</td>
     <td><strong>1</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
+</tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Chris Olave</td>
     <td>WR</td>
@@ -2156,8 +2156,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>4</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Stefon Diggs</td>
     <td>WR</td>
@@ -2167,7 +2167,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>5</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Brian Thomas</td>
@@ -2289,7 +2289,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Travis Kelce</td>
     <td>TE</td>
@@ -2299,8 +2299,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Joe Burrow</td>
     <td>QB</td>
@@ -2310,8 +2310,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 3 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Joe Mixon</td>
     <td>RB</td>
@@ -2321,8 +2321,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Tony Pollard</td>
     <td>RB</td>
@@ -2332,7 +2332,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>RJ Harvey</td>
@@ -2344,7 +2344,7 @@
     <td>0</td>
     <td><strong>4</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Chris Godwin</td>
     <td>WR</td>
@@ -2354,8 +2354,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>5</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Travis Etienne</td>
     <td>RB</td>
@@ -2365,8 +2365,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>6</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
+    <td></td>
+</tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Nick Chubb</td>
     <td>RB</td>
@@ -2376,7 +2376,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>7</strong></td>
-    <td><span class="review-badge" title="Continuously rostered, never dropped -- history suggests times_kept could be 4 (&gt;= max of 3). Verify before trusting.">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Ricky Pearsall</td>
