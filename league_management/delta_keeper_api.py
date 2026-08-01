@@ -134,6 +134,31 @@ def fetch_wire_added_player_ids(league_id, weeks=NFL_WEEKS):
     return added
 
 
+def fetch_waiver_adds_detail(league_id, weeks=NFL_WEEKS):
+    """
+    Latest single-player waiver claim per player_id for a season, with the
+    week and bid amount -- mirrors the current-season waiver_adds_by_player
+    construction, needed so historical reconstruction can apply the same
+    FAAB-based keeper round a waiver claim establishes (Article VI: a
+    player can be kept the year after being claimed off waivers, with no
+    draft pick involved at all, priced off the bid amount rather than a
+    draft round).
+    """
+    detail = {}
+    for week in range(1, weeks + 1):
+        txns = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/transactions/{week}")
+        for trans in txns:
+            if trans['status'] == 'failed' or trans['type'] != "waiver":
+                continue
+            if not trans['adds'] or len(trans['adds']) != 1:
+                continue
+            pid = str(next(iter(trans['adds'])))
+            rec = {'trans_week': trans['leg'], 'waiver_bid': trans['settings']['waiver_bid']}
+            if pid not in detail or trans['leg'] > detail[pid]['trans_week']:
+                detail[pid] = rec
+    return detail
+
+
 def fetch_traded_pick_slots(league_id):
     """
     (round, roster_id) pairs for draft picks that changed hands before a
@@ -154,7 +179,7 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     """
     Reconstruct how many consecutive seasons a player has already been kept.
 
-    A season only counts as a confirmed keep if EITHER:
+    A drafted season only counts as a confirmed keep if EITHER:
       1. Sleeper's is_keeper checkbox was set on that year's draft pick, OR
       2. The pick used was itself a traded pick (not the team's own original
          slot) -- proof the player couldn't have been freshly drafted with a
@@ -172,23 +197,38 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     that's underpaying the discount, which isn't possible for a real keep,
     so it proves the pick must have been a normal draft selection instead.
 
+    A season can ALSO establish (or override) next season's keeper-cost
+    baseline with no draft pick involved at all: Article VI lets a player be
+    kept the year after a waiver claim, priced off the FAAB bid via
+    get_round_from_faab(), as long as the claim landed before the keeper
+    deadline week and it isn't a high/early-round pick that season. This
+    mirrors the live per-season computation exactly (a same-season waiver
+    claim overrides the draft-based cost there too) -- confirmed for Trey
+    McBride's case: an early, $0 waiver claim priced him at exactly round
+    12, which is exactly the (traded) pick he was drafted with the next
+    season, with no prior draft appearance to check round math against at
+    all otherwise.
+
     The "Keeper Selections" Google Sheet, when it exists for that year, is
-    independent corroboration (not a requirement -- it has its own gaps,
-    which is exactly why Drake London's case slipped through in the first
-    place) and is recorded in the trail for transparency.
+    independent corroboration (a requirement only when there's no round
+    baseline yet to check math against -- a first sighting or the season
+    right after a FAAB baseline resets to no-history -- since it has its own
+    gaps, which is exactly why Drake London's case slipped through in the
+    first place) and is recorded in the trail for transparency.
 
     history_seasons: seasons strictly before the one being computed, oldest
     to newest, each {'season': year, 'picks': {player_id: pick},
-    'wire_added': {player_id,...}, 'kept_names': {player_name,...},
-    'traded_pick_slots': {(round, roster_id),...}}.
+    'wire_added': {player_id,...}, 'waiver_detail': {player_id: {trans_week,
+    waiver_bid}}, 'kept_names': {player_name,...}, 'traded_pick_slots':
+    {(round, roster_id),...}}.
 
-    Returns (times_kept, prev_round, trail). prev_round is the most recent
-    season's draft round (or None if the chain doesn't reach the season
-    right before the one being computed), which the caller needs to check
-    whether the season being computed also fits the pattern. trail is a
-    list of per-season dicts recording exactly which signal (or lack of
-    one) applied each year, for transparency before anyone corrects a
-    sheet off of this.
+    Returns (times_kept, prev_round, trail). prev_round is the keeper-cost
+    baseline entering the season being computed (from a draft pick or a
+    FAAB claim, whichever applies), or None if the chain doesn't reach the
+    season right before the one being computed. trail is a list of
+    per-season dicts recording exactly which signal (or lack of one)
+    applied each year, for transparency before anyone corrects a sheet off
+    of this.
     """
     times_kept = 0
     prev_round = None
@@ -196,58 +236,81 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     for season in history_seasons:
         yr = season.get('season')
         pick = season['picks'].get(player_id)
-        wire_added = player_id in season['wire_added']
-        if pick is None or wire_added:
-            reason = 'wire-added' if wire_added else 'not-drafted'
-            trail.append({'season': yr, 'round': None, 'signal': reason})
-            times_kept = 0
-            prev_round = None
+        wire_detail = season.get('waiver_detail', {}).get(player_id)
+        claimed_late = wire_detail is not None and wire_detail['trans_week'] >= KEEPER_DEADLINE_WEEK
+
+        if pick is None:
+            if wire_detail is None:
+                trail.append({'season': yr, 'round': None, 'signal': 'not-drafted'})
+                times_kept = 0
+                prev_round = None
+            elif claimed_late:
+                trail.append({'season': yr, 'round': None, 'signal': 'waiver-after-deadline'})
+                times_kept = 0
+                prev_round = None
+            else:
+                faab_round = get_round_from_faab(wire_detail['waiver_bid'])
+                trail.append({'season': yr, 'round': faab_round, 'signal': 'faab-baseline'})
+                times_kept = 0  # establishes a fresh cost, not itself a keep
+                prev_round = faab_round
             continue
+
         rnd = pick['round']
         rid = pick.get('roster_id')
+        high_draft_pick = rnd <= HIGH_PICK_THRESHOLD
         is_keeper_flag = bool(pick.get('is_keeper'))
         pick_was_traded = (rnd, rid) in season.get('traded_pick_slots', set())
         sheet_recorded = player_name in season.get('kept_names', set())
 
+        if rnd == 1 and FIRST_ROUND_INELIGIBLE:
+            trail.append({'season': yr, 'round': rnd, 'signal': 'first-round-ineligible'})
+            times_kept = 0
+            prev_round = None
+            continue
+
         if prev_round is not None:
-            # A real prior season exists to be continuing from -- a traded
-            # pick here is meaningful evidence.
-            is_candidate = is_keeper_flag or pick_was_traded
+            # A real prior baseline exists (from a draft pick or a FAAB
+            # claim) to be continuing from -- a traded pick here is
+            # meaningful evidence, checked against the formula.
             expected = prev_round - (1 + times_kept)
             round_makes_sense = expected - 1 <= rnd <= expected
+            confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
         else:
-            # First sighting in the chain (a rookie's debut, or right after
-            # a wire-add reset) -- there's no streak to continue, so a
-            # traded pick here is just ordinary draft-pick trading, totally
-            # unrelated to keepers. Only a direct is_keeper flag counts
-            # (which shouldn't even be possible for a true rookie, but
-            # doesn't hurt to allow for correctness).
-            is_candidate = is_keeper_flag
+            # No baseline to check round math against -- a true rookie
+            # debut (a traded pick here is just ordinary draft-pick
+            # trading, unrelated to keepers), or a player being kept for
+            # the first time with nothing but the sheet to confirm it.
             round_makes_sense = True
+            confirmed = is_keeper_flag or sheet_recorded
 
-        confirmed = is_keeper_flag or (pick_was_traded and prev_round is not None and round_makes_sense)
         if confirmed:
-            signals = []
-            if is_keeper_flag:
-                signals.append('is_keeper-flag')
-            if pick_was_traded:
-                signals.append('traded-pick')
-            if sheet_recorded:
-                signals.append('sheet-record')
-            if not round_makes_sense:
-                signals.append('round-does-not-match-formula(trusting is_keeper anyway)')
-            trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
             times_kept += 1
-        elif is_candidate and not round_makes_sense:
-            # Traded pick, but drafted LATER than the required keeper cost --
-            # can't have been kept at that discount, so this must actually be
-            # a normal pick (or a traded pick used on an unrelated player).
-            trail.append({'season': yr, 'round': rnd, 'signal': 'traded-pick-but-round-too-late'})
+        else:
+            times_kept = 0
+
+        signals = []
+        if is_keeper_flag:
+            signals.append('is_keeper-flag')
+        if pick_was_traded:
+            signals.append('traded-pick')
+        if sheet_recorded:
+            signals.append('sheet-record')
+        if confirmed and not round_makes_sense:
+            signals.append('round-does-not-match-formula(trusting is_keeper anyway)')
+        if not signals:
+            signals.append('traded-pick-but-round-too-late' if (pick_was_traded and not round_makes_sense)
+                            else 'baseline/normal-pick')
+        trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
+
+        # A same-season waiver claim (in-season churn: dropped after the
+        # draft, re-claimed later) overrides the draft-based cost for next
+        # season, exactly like the live per-season computation -- his most
+        # recent acquisition method wins.
+        if wire_detail is not None and not high_draft_pick and not claimed_late:
+            prev_round = get_round_from_faab(wire_detail['waiver_bid'])
             times_kept = 0
         else:
-            trail.append({'season': yr, 'round': rnd, 'signal': 'baseline/normal-pick'})
-            times_kept = 0
-        prev_round = rnd
+            prev_round = rnd
     return times_kept, prev_round, trail
 
 
@@ -475,7 +538,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     history_seasons = []
     for season, hist_league_id in found_seasons:
         hist_picks = fetch_draft_picks_by_player(hist_league_id)
-        hist_wire = fetch_wire_added_player_ids(hist_league_id)
+        hist_waiver_detail = fetch_waiver_adds_detail(hist_league_id)
         hist_traded_slots = fetch_traded_pick_slots(hist_league_id)
         hist_kept_names = set()
         try:
@@ -487,10 +550,10 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
         except FileNotFoundError:
             pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
         history_seasons.append({
-            'season': season, 'picks': hist_picks, 'wire_added': hist_wire,
+            'season': season, 'picks': hist_picks, 'waiver_detail': hist_waiver_detail,
             'kept_names': hist_kept_names, 'traded_pick_slots': hist_traded_slots,
         })
-        print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_wire)} wire adds, "
+        print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_waiver_detail)} waiver claims, "
               f"{len(hist_kept_names)} sheet-recorded keepers, {len(hist_traded_slots)} traded pick slots")
 
     print("Computing keeper values...")
