@@ -252,7 +252,12 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
                 faab_round = get_round_from_faab(wire_detail['waiver_bid'])
                 trail.append({'season': yr, 'round': faab_round, 'signal': 'faab-baseline'})
                 times_kept = 0  # establishes a fresh cost, not itself a keep
-                prev_round = faab_round
+                # get_round_from_faab() already IS the computed keeper cost
+                # for next season (not a raw "round" to subtract from again)
+                # -- store it +1 so the general `prev_round - (1+times_kept)`
+                # check below reproduces it exactly with times_kept=0, same
+                # as how a fresh (non-keeper) draft pick's cost is round_-1.
+                prev_round = faab_round + 1
             continue
 
         rnd = pick['round']
@@ -285,29 +290,29 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
 
         if confirmed:
             times_kept += 1
+            signals = []
+            if is_keeper_flag:
+                signals.append('is_keeper-flag')
+            if pick_was_traded:
+                signals.append('traded-pick')
+            if sheet_recorded:
+                signals.append('sheet-record')
+            if not round_makes_sense:
+                signals.append('round-does-not-match-formula(trusting is_keeper anyway)')
+            trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
         else:
             times_kept = 0
-
-        signals = []
-        if is_keeper_flag:
-            signals.append('is_keeper-flag')
-        if pick_was_traded:
-            signals.append('traded-pick')
-        if sheet_recorded:
-            signals.append('sheet-record')
-        if confirmed and not round_makes_sense:
-            signals.append('round-does-not-match-formula(trusting is_keeper anyway)')
-        if not signals:
-            signals.append('traded-pick-but-round-too-late' if (pick_was_traded and not round_makes_sense)
-                            else 'baseline/normal-pick')
-        trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
+            reason = 'traded-pick-but-round-too-late' if (pick_was_traded and not round_makes_sense) \
+                else 'baseline/normal-pick'
+            trail.append({'season': yr, 'round': rnd, 'signal': reason})
 
         # A same-season waiver claim (in-season churn: dropped after the
         # draft, re-claimed later) overrides the draft-based cost for next
         # season, exactly like the live per-season computation -- his most
-        # recent acquisition method wins.
+        # recent acquisition method wins. Same +1 units fix as the
+        # standalone FAAB-baseline case above.
         if wire_detail is not None and not high_draft_pick and not claimed_late:
-            prev_round = get_round_from_faab(wire_detail['waiver_bid'])
+            prev_round = get_round_from_faab(wire_detail['waiver_bid']) + 1
             times_kept = 0
         else:
             prev_round = rnd
