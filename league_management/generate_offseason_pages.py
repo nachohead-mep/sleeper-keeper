@@ -269,7 +269,7 @@ def generate_keeper_values(keeper_df, year, sheet_id):
             row_classes.append("needs-review")
         cls = f' class="{" ".join(row_classes)}"' if row_classes else ""
         review_cell = (
-            f'<span class="review-badge" title="{_escape(review_flag)}">&#9888; review</span>'
+            f'<span class="review-badge" title="{_escape(review_flag)}">&#9888; corrected</span>'
             if review_flag else ""
         )
 
@@ -289,7 +289,7 @@ def generate_keeper_values(keeper_df, year, sheet_id):
     eligible_count = len(keeper_df[keeper_df["Keeper Eligible"] == True])  # noqa
     review_count = int((keeper_df.get("Review Flag", "") != "").sum())
     review_note = (
-        f' &middot; <span class="review-badge-inline">&#9888; {review_count} flagged for manual review</span>'
+        f' &middot; <span class="review-badge-inline">&#9888; {review_count} times_kept auto-corrected</span>'
         if review_count else ""
     )
     sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
@@ -302,11 +302,12 @@ def generate_keeper_values(keeper_df, year, sheet_id):
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Keeper Values {year}</h1>
         <p class="subtitle">{len(keeper_df)} players &middot; {len(teams)} teams &middot; {eligible_count} eligible{review_note}</p>
-        <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet, which miss traded-for players (Sleeper's own keeper mechanic only works off a team's
-            original draft slot). &#9888; review rows have reconstructed history &mdash; matching the keeper-discount
-            formula every year, or a sheet-recorded selection &mdash; that disagrees with the shown count, either
-            flipping eligibility or just pricing the discount at the wrong tier. Verify before correcting.</p>
+        <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd normally come from Sleeper's is_keeper
+            flag and the Keeper Selections sheet, which miss players kept via a traded pick (Sleeper's own keeper
+            mechanic only recognizes a team's own original draft slot, so this league drafts those keeps manually
+            instead). &#9888; corrected rows were fixed from reconstructed history &mdash; confirmed each year by
+            either the is_keeper flag or a verified traded pick with a round that makes sense as a keeper cost, never
+            roster continuity alone. Hover for the year-by-year evidence trail.</p>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
