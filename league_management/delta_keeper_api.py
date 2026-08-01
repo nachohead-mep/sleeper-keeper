@@ -208,15 +208,24 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
         is_keeper_flag = bool(pick.get('is_keeper'))
         pick_was_traded = (rnd, rid) in season.get('traded_pick_slots', set())
         sheet_recorded = player_name in season.get('kept_names', set())
-        is_candidate = is_keeper_flag or pick_was_traded
 
-        if is_candidate and prev_round is not None:
+        if prev_round is not None:
+            # A real prior season exists to be continuing from -- a traded
+            # pick here is meaningful evidence.
+            is_candidate = is_keeper_flag or pick_was_traded
             expected = prev_round - (1 + times_kept)
             round_makes_sense = expected - 1 <= rnd <= expected
         else:
-            round_makes_sense = prev_round is None  # nothing to compare against yet -- first sighting
+            # First sighting in the chain (a rookie's debut, or right after
+            # a wire-add reset) -- there's no streak to continue, so a
+            # traded pick here is just ordinary draft-pick trading, totally
+            # unrelated to keepers. Only a direct is_keeper flag counts
+            # (which shouldn't even be possible for a true rookie, but
+            # doesn't hurt to allow for correctness).
+            is_candidate = is_keeper_flag
+            round_makes_sense = True
 
-        confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
+        confirmed = is_keeper_flag or (pick_was_traded and prev_round is not None and round_makes_sense)
         if confirmed:
             signals = []
             if is_keeper_flag:
