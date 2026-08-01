@@ -134,27 +134,30 @@ def fetch_wire_added_player_ids(league_id, weeks=NFL_WEEKS):
     return added
 
 
-def reconstruct_prior_keep_streak(player_id, history_seasons):
+def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     """
-    Reconstruct how many consecutive seasons a player has already been kept,
-    using Sleeper's own draft/transaction history rather than trusting a
-    single is_keeper checkbox — league operators running the live draft
-    sometimes forget to toggle it even though the player was never actually
-    dropped, which otherwise silently resets the keeper clock in the
-    Google Sheet this script self-references year over year.
+    Reconstruct how many consecutive seasons a player has already been kept.
 
-    Continuous rostering alone is NOT enough evidence: a star who's simply
-    never droppable gets re-drafted every year regardless, at whatever his
-    current market round is (often trending down on his own merit, or just
-    bouncing around) -- indistinguishable from a keeper discount by roster
-    presence alone. A genuine keep instead leaves a specific fingerprint:
-    each year's draft round must equal round_ - (1 + times_kept_so_far),
-    the exact same formula this script uses to compute keeper cost. So a
-    season only counts as a continuation if the round actually matches
-    that formula, not merely if the player is still on a roster.
+    Three signals are checked per season, any one of which counts as an
+    explicit/confirmed keep for that year:
+      1. Sleeper's is_keeper checkbox on that year's draft pick — a manual
+         toggle that league operators sometimes forget to set.
+      2. That year's "Keeper Selections" Google Sheet tab — a direct human
+         record of who each team actually selected as a keeper, independent
+         of whether Sleeper's checkbox was set. The most authoritative
+         signal when available.
+      3. Round-arithmetic match: that year's draft round equals
+         round_ - (1 + times_kept_so_far), the exact formula this script
+         uses to compute keeper cost. Continuous rostering alone is NOT
+         enough (a star who's simply never droppable gets re-drafted every
+         year regardless, at whatever his current market round is) — but a
+         genuine keep leaves this precise fingerprint, confirmed for Drake
+         London's case (9 -> 8 -> 6 -> 3, exact every year).
 
     history_seasons: seasons strictly before the one being computed, oldest
-    to newest, each {'picks': {player_id: pick}, 'wire_added': {player_id,...}}.
+    to newest, each {'picks': {player_id: pick}, 'wire_added': {player_id,...},
+    'kept_names': {player_name,...}}. 'kept_names' may be an empty set for
+    seasons before the Keeper Selections sheet existed.
 
     Returns (times_kept, prev_round). prev_round is the most recent season's
     draft round (or None if the chain doesn't reach the season right before
@@ -171,7 +174,7 @@ def reconstruct_prior_keep_streak(player_id, history_seasons):
             prev_round = None
             continue
         rnd = pick['round']
-        explicit_keep = bool(pick.get('is_keeper'))
+        explicit_keep = bool(pick.get('is_keeper')) or player_name in season.get('kept_names', set())
         round_matches = prev_round is not None and rnd == prev_round - (1 + times_kept)
         if explicit_keep or round_matches:
             times_kept += 1
@@ -404,8 +407,18 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     for season, hist_league_id in found_seasons:
         hist_picks = fetch_draft_picks_by_player(hist_league_id)
         hist_wire = fetch_wire_added_player_ids(hist_league_id)
-        history_seasons.append({'picks': hist_picks, 'wire_added': hist_wire})
-        print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_wire)} wire adds")
+        hist_kept_names = set()
+        try:
+            hist_sheet_id = find_keeper_sheet(drive_svc, season)
+            hist_selections = read_sheet_tab(sheets_svc, hist_sheet_id, "Keeper Selections")
+            for col in keeper_columns:
+                if col in hist_selections.columns:
+                    hist_kept_names.update(hist_selections[col].dropna())
+        except FileNotFoundError:
+            pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
+        history_seasons.append({'picks': hist_picks, 'wire_added': hist_wire, 'kept_names': hist_kept_names})
+        print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_wire)} wire adds, "
+              f"{len(hist_kept_names)} sheet-recorded keepers")
 
     print("Computing keeper values...")
     keeper_rows = []
@@ -452,39 +465,63 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     else:
                         print(f"    WARNING: {player_name} flagged as keeper but not in previous year's sheet")
 
-                # Cross-check against draft/transaction history: is_keeper is a
-                # manual checkbox in Sleeper's draft room and gets missed. Raw
-                # roster continuity is too noisy on its own (plenty of studs
-                # never get dropped and are simply re-drafted at whatever
-                # their current market round is, not "kept" at a discount) --
-                # so this requires the round arithmetic itself to match the
-                # keeper-cost formula at every step, the same fingerprint that
-                # confirmed Drake London's case (9 -> 8 -> 6 -> 3, exact).
-                # Doesn't override eligibility either way; only surfaces a
-                # review flag so a human can check real history.
+                # Cross-check against reconstructed history: Sleeper's is_keeper
+                # checkbox is a manual toggle that doesn't even work at all for
+                # a common case in this league -- keeping a player acquired via
+                # trade, since Sleeper's native keeper mechanic only recognizes
+                # a team's own original draft slot. Those keeps get manually
+                # entered as a plain draft pick instead, so is_keeper is
+                # structurally absent, not just forgotten. Raw roster
+                # continuity is too noisy to fill that gap on its own (plenty
+                # of studs never get dropped and are simply re-drafted at
+                # whatever their current market round is, not "kept" at a
+                # discount) -- so a season only counts as a reconstructed
+                # continuation if EITHER the Keeper Selections sheet recorded
+                # it that year, OR the round arithmetic matches the
+                # keeper-cost formula exactly, the fingerprint confirmed for
+                # Drake London (9 -> 8 -> 6 -> 3, exact every year).
+                #
+                # This never overrides eligibility/keeper_round automatically
+                # -- it only surfaces a review flag, covering two distinct
+                # failure modes: (a) times_kept undercounted enough to flip
+                # eligibility (like Drake London), and (b) times_kept off by
+                # a smaller amount that still leaves the player eligible but
+                # prices the discount at the wrong tier (e.g. costed as a
+                # 1st-year keep when history says it's really the 2nd).
                 wire_added_this_season = player_id in current_wire_added
                 reconstructed_prev_tk, reconstructed_prev_round = reconstruct_prior_keep_streak(
-                    player_id, history_seasons
+                    player_id, player_name, history_seasons
                 )
                 round_confirms_this_season = (
                     reconstructed_prev_round is not None
                     and round_ == reconstructed_prev_round - (1 + reconstructed_prev_tk)
                 )
-                if (
-                    round_ != 1
-                    and not flagged_keeper
+                is_reconstructed_continuation = (
+                    reconstructed_prev_round is not None
                     and not wire_added_this_season
-                    and round_confirms_this_season
-                    and (reconstructed_prev_tk + 1) >= MAX_CONSECUTIVE_KEEPS
-                ):
-                    review_flag = (
-                        f"Draft round history matches the keeper-discount formula exactly "
-                        f"every year -- times_kept is likely {reconstructed_prev_tk + 1} "
-                        f"(>= max of {MAX_CONSECUTIVE_KEEPS}), but is_keeper was never flagged. "
-                        f"Verify against real history before correcting."
-                    )
-                    print(f"    REVIEW: {player_name} ({team_name}) - round trend confirms a likely "
-                          f"missed keep flag, times_kept could be {reconstructed_prev_tk + 1}")
+                    and (flagged_keeper or round_confirms_this_season)
+                )
+                if round_ != 1 and is_reconstructed_continuation:
+                    reconstructed_times_kept = reconstructed_prev_tk + 1
+                    if reconstructed_times_kept != times_kept:
+                        corrected_round = round_ - (1 + reconstructed_times_kept)
+                        would_flip = reconstructed_times_kept >= MAX_CONSECUTIVE_KEEPS or corrected_round < 1
+                        direction = "undercounted" if reconstructed_times_kept > times_kept else "overcounted"
+                        if would_flip:
+                            impact = "this would flip eligibility to NOT ELIGIBLE"
+                        else:
+                            impact = (
+                                f"still eligible either way, but Keeper Round may be priced wrong "
+                                f"(currently {keeper_round}, history suggests {corrected_round})"
+                            )
+                        review_flag = (
+                            f"times_kept looks {direction}: shown as {times_kept}, history "
+                            f"(draft rounds + Keeper Selections sheets) suggests {reconstructed_times_kept}. "
+                            f"{impact}. Verify before correcting."
+                        )
+                        print(f"    REVIEW: {player_name} ({team_name}) - times_kept {direction}, "
+                              f"shown {times_kept} vs reconstructed {reconstructed_times_kept}"
+                              + (" [FLIPS ELIGIBILITY]" if would_flip else " [pricing only]"))
 
             rookie_adp = rookie_by_name.get(player_name)
             if rookie_adp is not None:

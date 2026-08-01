@@ -303,9 +303,10 @@ def generate_keeper_values(keeper_df, year, sheet_id):
         <h1>Keeper Values {year}</h1>
         <p class="subtitle">{len(keeper_df)} players &middot; {len(teams)} teams &middot; {eligible_count} eligible{review_note}</p>
         <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet. &#9888; review rows have a draft-round history that matches the keeper-discount formula
-            exactly every year even though is_keeper was never flagged &mdash; a strong signal (not just "never dropped")
-            that a keep was missed. Verify against real history before correcting the count.</p>
+            Selections sheet, which miss traded-for players (Sleeper's own keeper mechanic only works off a team's
+            original draft slot). &#9888; review rows have reconstructed history &mdash; matching the keeper-discount
+            formula every year, or a sheet-recorded selection &mdash; that disagrees with the shown count, either
+            flipping eligibility or just pricing the discount at the wrong tier. Verify before correcting.</p>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
