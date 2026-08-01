@@ -175,6 +175,13 @@ header .subtitle { color: var(--text-secondary); font-size: 0.95rem; }
     background: rgba(232, 185, 35, 0.45); vertical-align: middle; margin-right: 5px;
 }
 
+/* ── Keeper values: possible missed-keeper review flag ─────── */
+.data-table tr.needs-review td { background: rgba(232, 185, 35, 0.12); }
+.review-badge {
+    color: var(--wc-gold); font-size: 0.72rem; font-weight: 700; white-space: nowrap; cursor: help;
+}
+.review-badge-inline { color: var(--wc-gold); font-weight: 600; }
+
 /* ── Rookie draft table ───────────────────────────────────── */
 .draft-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .draft-table th {
