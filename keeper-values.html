@@ -200,11 +200,12 @@
 </svg>
 </div>
         <h1>Keeper Values 2026</h1>
-        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible &middot; <span class="review-badge-inline">&#9888; 1 flagged for manual review</span></p>
+        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible &middot; <span class="review-badge-inline">&#9888; 8 flagged for manual review</span></p>
         <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet. &#9888; review rows have a draft-round history that matches the keeper-discount formula
-            exactly every year even though is_keeper was never flagged &mdash; a strong signal (not just "never dropped")
-            that a keep was missed. Verify against real history before correcting the count.</p>
+            Selections sheet, which miss traded-for players (Sleeper's own keeper mechanic only works off a team's
+            original draft slot). &#9888; review rows have reconstructed history &mdash; matching the keeper-discount
+            formula every year, or a sheet-recorded selection &mdash; that disagrees with the shown count, either
+            flipping eligibility or just pricing the discount at the wrong tier. Verify before correcting.</p>
         <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -254,7 +255,7 @@
     <td>0</td>
     <td><strong>3</strong></td>
     <td></td>
-</tr><tr data-team="DannyN" data-eligible="true">
+</tr><tr class="needs-review" data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>Jaxon Smith-Njigba</td>
     <td>WR</td>
@@ -264,7 +265,7 @@
     <td>True</td>
     <td>1</td>
     <td><strong>3</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 1, history (draft rounds + Keeper Selections sheets) suggests 2. still eligible either way, but Keeper Round may be priced wrong (currently 3, history suggests 2). Verify before correcting.">&#9888; review</span></td>
 </tr><tr data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>Mark Andrews</td>
@@ -452,7 +453,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr data-team="Friedo" data-eligible="true">
+</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Lamar Jackson</td>
     <td>QB</td>
@@ -462,7 +463,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. this would flip eligibility to NOT ELIGIBLE. Verify before correcting.">&#9888; review</span></td>
 </tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Drake London</td>
@@ -473,8 +474,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td><span class="review-badge" title="Draft round history matches the keeper-discount formula exactly every year -- times_kept is likely 3 (&gt;= max of 3), but is_keeper was never flagged. Verify against real history before correcting.">&#9888; review</span></td>
-</tr><tr data-team="Friedo" data-eligible="true">
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 3. this would flip eligibility to NOT ELIGIBLE. Verify before correcting.">&#9888; review</span></td>
+</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>George Pickens</td>
     <td>WR</td>
@@ -484,7 +485,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 2, history suggests 1). Verify before correcting.">&#9888; review</span></td>
 </tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Deebo Samuel</td>
@@ -1057,7 +1058,7 @@
     <td>2</td>
     <td><strong>7</strong></td>
     <td></td>
-</tr><tr data-team="ashanes" data-eligible="true">
+</tr><tr class="needs-review" data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Brandon Aubrey</td>
     <td>K</td>
@@ -1067,7 +1068,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>10</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 10, history suggests 9). Verify before correcting.">&#9888; review</span></td>
 </tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Keenan Allen</td>
@@ -1189,7 +1190,7 @@
     <td>0</td>
     <td><strong>1</strong></td>
     <td></td>
-</tr><tr data-team="dbleykhman" data-eligible="true">
+</tr><tr class="needs-review" data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>D'Andre Swift</td>
     <td>RB</td>
@@ -1199,8 +1200,8 @@
     <td>True</td>
     <td>0</td>
     <td><strong>2</strong></td>
-    <td></td>
-</tr><tr data-team="dbleykhman" data-eligible="true">
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 2, history suggests 1). Verify before correcting.">&#9888; review</span></td>
+</tr><tr class="needs-review" data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>Garrett Wilson</td>
     <td>WR</td>
@@ -1210,7 +1211,7 @@
     <td>True</td>
     <td>2</td>
     <td><strong>1</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 2, history (draft rounds + Keeper Selections sheets) suggests 3. this would flip eligibility to NOT ELIGIBLE. Verify before correcting.">&#9888; review</span></td>
 </tr><tr class="ineligible" data-team="dbleykhman" data-eligible="false">
     <td>dbleykhman</td>
     <td>Xavier Worthy</td>
@@ -2124,7 +2125,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr data-team="zachjd5" data-eligible="true">
+</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Tee Higgins</td>
     <td>WR</td>
@@ -2134,7 +2135,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td></td>
+    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. this would flip eligibility to NOT ELIGIBLE. Verify before correcting.">&#9888; review</span></td>
 </tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Malik Nabers</td>
