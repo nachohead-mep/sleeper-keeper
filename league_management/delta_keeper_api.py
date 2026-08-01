@@ -155,33 +155,51 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
          London's case (9 -> 8 -> 6 -> 3, exact every year).
 
     history_seasons: seasons strictly before the one being computed, oldest
-    to newest, each {'picks': {player_id: pick}, 'wire_added': {player_id,...},
-    'kept_names': {player_name,...}}. 'kept_names' may be an empty set for
-    seasons before the Keeper Selections sheet existed.
+    to newest, each {'season': year, 'picks': {player_id: pick},
+    'wire_added': {player_id,...}, 'kept_names': {player_name,...}}.
+    'kept_names' may be an empty set for seasons before the Keeper
+    Selections sheet existed.
 
-    Returns (times_kept, prev_round). prev_round is the most recent season's
-    draft round (or None if the chain doesn't reach the season right before
-    the one being computed), which the caller needs to check whether the
-    season being computed also fits the pattern.
+    Returns (times_kept, prev_round, trail). prev_round is the most recent
+    season's draft round (or None if the chain doesn't reach the season
+    right before the one being computed), which the caller needs to check
+    whether the season being computed also fits the pattern. trail is a
+    list of per-season dicts recording exactly which signal (or lack of
+    one) applied each year, for transparency before anyone corrects a
+    sheet off of this.
     """
     times_kept = 0
     prev_round = None
+    trail = []
     for season in history_seasons:
+        yr = season.get('season')
         pick = season['picks'].get(player_id)
         wire_added = player_id in season['wire_added']
         if pick is None or wire_added:
+            reason = 'wire-added' if wire_added else 'not-drafted'
+            trail.append({'season': yr, 'round': None, 'signal': reason})
             times_kept = 0
             prev_round = None
             continue
         rnd = pick['round']
-        explicit_keep = bool(pick.get('is_keeper')) or player_name in season.get('kept_names', set())
+        is_keeper_flag = bool(pick.get('is_keeper'))
+        sheet_recorded = player_name in season.get('kept_names', set())
         round_matches = prev_round is not None and rnd == prev_round - (1 + times_kept)
-        if explicit_keep or round_matches:
+        if is_keeper_flag or sheet_recorded or round_matches:
+            signals = []
+            if is_keeper_flag:
+                signals.append('is_keeper-flag')
+            if sheet_recorded:
+                signals.append('sheet-record')
+            if round_matches:
+                signals.append('round-match')
+            trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
             times_kept += 1
         else:
+            trail.append({'season': yr, 'round': rnd, 'signal': 'baseline/break'})
             times_kept = 0
         prev_round = rnd
-    return times_kept, prev_round
+    return times_kept, prev_round, trail
 
 
 # ---------------------------------------------------------------------------
@@ -416,7 +434,9 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     hist_kept_names.update(hist_selections[col].dropna())
         except FileNotFoundError:
             pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
-        history_seasons.append({'picks': hist_picks, 'wire_added': hist_wire, 'kept_names': hist_kept_names})
+        history_seasons.append({
+            'season': season, 'picks': hist_picks, 'wire_added': hist_wire, 'kept_names': hist_kept_names,
+        })
         print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_wire)} wire adds, "
               f"{len(hist_kept_names)} sheet-recorded keepers")
 
@@ -489,7 +509,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                 # prices the discount at the wrong tier (e.g. costed as a
                 # 1st-year keep when history says it's really the 2nd).
                 wire_added_this_season = player_id in current_wire_added
-                reconstructed_prev_tk, reconstructed_prev_round = reconstruct_prior_keep_streak(
+                reconstructed_prev_tk, reconstructed_prev_round, reconstructed_trail = reconstruct_prior_keep_streak(
                     player_id, player_name, history_seasons
                 )
                 round_confirms_this_season = (
@@ -507,6 +527,9 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                         corrected_round = round_ - (1 + reconstructed_times_kept)
                         would_flip = reconstructed_times_kept >= MAX_CONSECUTIVE_KEEPS or corrected_round < 1
                         direction = "undercounted" if reconstructed_times_kept > times_kept else "overcounted"
+                        trail_str = " -> ".join(
+                            f"{t['season']}:{t['round']}({t['signal']})" for t in reconstructed_trail
+                        )
                         if would_flip:
                             impact = "this would flip eligibility to NOT ELIGIBLE"
                         else:
@@ -517,11 +540,12 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                         review_flag = (
                             f"times_kept looks {direction}: shown as {times_kept}, history "
                             f"(draft rounds + Keeper Selections sheets) suggests {reconstructed_times_kept}. "
-                            f"{impact}. Verify before correcting."
+                            f"{impact}. Verify before correcting. Trail: {trail_str}"
                         )
                         print(f"    REVIEW: {player_name} ({team_name}) - times_kept {direction}, "
                               f"shown {times_kept} vs reconstructed {reconstructed_times_kept}"
-                              + (" [FLIPS ELIGIBILITY]" if would_flip else " [pricing only]"))
+                              + (" [FLIPS ELIGIBILITY]" if would_flip else " [pricing only]")
+                              + f" | {trail_str}")
 
             rookie_adp = rookie_by_name.get(player_name)
             if rookie_adp is not None:
