@@ -303,9 +303,9 @@ def generate_keeper_values(keeper_df, year, sheet_id):
         <h1>Keeper Values {year}</h1>
         <p class="subtitle">{len(keeper_df)} players &middot; {len(teams)} teams &middot; {eligible_count} eligible{review_note}</p>
         <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet. &#9888; review rows were continuously rostered (never dropped) long enough that history
-            <em>might</em> mean an unflagged keeper was missed &mdash; verify against real history before trusting the count,
-            continuous rostering alone doesn't prove a discount was exercised.</p>
+            Selections sheet. &#9888; review rows have a draft-round history that matches the keeper-discount formula
+            exactly every year even though is_keeper was never flagged &mdash; a strong signal (not just "never dropped")
+            that a keep was missed. Verify against real history before correcting the count.</p>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
