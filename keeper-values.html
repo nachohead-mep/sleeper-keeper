@@ -200,12 +200,13 @@
 </svg>
 </div>
         <h1>Keeper Values 2026</h1>
-        <p class="subtitle">202 players &middot; 12 teams &middot; 159 eligible &middot; <span class="review-badge-inline">&#9888; 8 flagged for manual review</span></p>
-        <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
-            Selections sheet, which miss traded-for players (Sleeper's own keeper mechanic only works off a team's
-            original draft slot). &#9888; review rows have reconstructed history &mdash; matching the keeper-discount
-            formula every year, or a sheet-recorded selection &mdash; that disagrees with the shown count, either
-            flipping eligibility or just pricing the discount at the wrong tier. Verify before correcting.</p>
+        <p class="subtitle">202 players &middot; 12 teams &middot; 154 eligible &middot; <span class="review-badge-inline">&#9888; 15 times_kept auto-corrected</span></p>
+        <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd normally come from Sleeper's is_keeper
+            flag and the Keeper Selections sheet, which miss players kept via a traded pick (Sleeper's own keeper
+            mechanic only recognizes a team's own original draft slot, so this league drafts those keeps manually
+            instead). &#9888; corrected rows were fixed from reconstructed history &mdash; confirmed each year by
+            either the is_keeper flag or a verified traded pick with a round that makes sense as a keeper cost, never
+            roster continuity alone. Hover for the year-by-year evidence trail.</p>
         <a class="sheet-link" href="https://docs.google.com/spreadsheets/d/1BDMxK_aXO3uRSkIEHr6oDowLUvqWCQd5vxkmanFcRPU/edit" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -255,7 +256,7 @@
     <td>0</td>
     <td><strong>3</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="DannyN" data-eligible="true">
+</tr><tr data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>Jaxon Smith-Njigba</td>
     <td>WR</td>
@@ -265,7 +266,7 @@
     <td>True</td>
     <td>1</td>
     <td><strong>3</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 1, history (draft rounds + Keeper Selections sheets) suggests 2. still eligible either way, but Keeper Round may be priced wrong (currently 3, history suggests 2). Verify before correcting. Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:7(baseline/break) -&gt; 2024:6(round-match)">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="DannyN" data-eligible="true">
     <td>DannyN</td>
     <td>Mark Andrews</td>
@@ -453,7 +454,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+</tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Lamar Jackson</td>
     <td>QB</td>
@@ -463,18 +464,18 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. this would flip eligibility to NOT ELIGIBLE. Verify before correcting. Trail: 2021:5(baseline/break) -&gt; 2022:5(baseline/break) -&gt; 2023:4(round-match) -&gt; 2024:3(baseline/break)">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
+    <td></td>
+</tr><tr class="ineligible needs-review" data-team="Friedo" data-eligible="false">
     <td>Friedo</td>
     <td>Drake London</td>
     <td>WR</td>
     <td>3</td>
     <td class="col-hide-mobile">35</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
-    <td>True</td>
-    <td>0</td>
-    <td><strong>2</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 3. this would flip eligibility to NOT ELIGIBLE. Verify before correcting. Trail: 2021:None(not-drafted) -&gt; 2022:9(baseline/break) -&gt; 2023:8(is_keeper-flag+round-match) -&gt; 2024:6(sheet-record+round-match)">&#9888; review</span></td>
+    <td>False</td>
+    <td>3</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 2), history confirms 3 (Keeper Round -1). Now NOT ELIGIBLE. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:9(baseline/normal-pick) -&gt; 2023:8(is_keeper-flag+traded-pick) -&gt; 2024:6(traded-pick+sheet-record)">&#9888; corrected</span></td>
 </tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>George Pickens</td>
@@ -483,9 +484,9 @@
     <td class="col-hide-mobile">28</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>0</td>
-    <td><strong>2</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 2, history suggests 1). Verify before correcting. Trail: 2021:None(not-drafted) -&gt; 2022:11(baseline/break) -&gt; 2023:10(is_keeper-flag+round-match) -&gt; 2024:4(baseline/break)">&#9888; review</span></td>
+    <td>1</td>
+    <td><strong>1</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 2), history confirms 1 (Keeper Round 1). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:11(traded-pick) -&gt; 2023:10(is_keeper-flag+traded-pick+round-does-not-match-formula(trusting is_keeper anyway)) -&gt; 2024:4(baseline/normal-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Deebo Samuel</td>
@@ -552,7 +553,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr data-team="Friedo" data-eligible="true">
+</tr><tr class="needs-review" data-team="Friedo" data-eligible="true">
     <td>Friedo</td>
     <td>Bucky Irving</td>
     <td>RB</td>
@@ -560,9 +561,9 @@
     <td class="col-hide-mobile">137</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>10</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>9</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 10), history confirms 2 (Keeper Round 9). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:15(traded-pick)">&#9888; corrected</span></td>
 </tr><tr class="ineligible" data-team="Friedo" data-eligible="false">
     <td>Friedo</td>
     <td>Brock Purdy</td>
@@ -805,17 +806,17 @@
     <td>0</td>
     <td><strong>11</strong></td>
     <td></td>
-</tr><tr data-team="JoshWasserman" data-eligible="true">
+</tr><tr class="ineligible needs-review" data-team="JoshWasserman" data-eligible="false">
     <td>JoshWasserman</td>
     <td>Kenneth Walker</td>
     <td>RB</td>
     <td>2</td>
     <td class="col-hide-mobile">21</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
-    <td>True</td>
-    <td>0</td>
-    <td><strong>1</strong></td>
-    <td></td>
+    <td>False</td>
+    <td>3</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 1), history confirms 3 (Keeper Round -2). Now NOT ELIGIBLE. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:9(baseline/normal-pick) -&gt; 2023:8(is_keeper-flag) -&gt; 2024:6(is_keeper-flag+sheet-record)">&#9888; corrected</span></td>
 </tr><tr data-team="JoshWasserman" data-eligible="true">
     <td>JoshWasserman</td>
     <td>TreVeyon Henderson</td>
@@ -1058,7 +1059,7 @@
     <td>2</td>
     <td><strong>7</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="ashanes" data-eligible="true">
+</tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Brandon Aubrey</td>
     <td>K</td>
@@ -1068,7 +1069,7 @@
     <td>True</td>
     <td>0</td>
     <td><strong>10</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 10, history suggests 9). Verify before correcting. Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(wire-added) -&gt; 2024:12(baseline/break)">&#9888; review</span></td>
+    <td></td>
 </tr><tr data-team="ashanes" data-eligible="true">
     <td>ashanes</td>
     <td>Keenan Allen</td>
@@ -1198,20 +1199,20 @@
     <td class="col-hide-mobile">32</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>0</td>
-    <td><strong>2</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. still eligible either way, but Keeper Round may be priced wrong (currently 2, history suggests 1). Verify before correcting. Trail: 2021:4(baseline/break) -&gt; 2022:3(is_keeper-flag+round-match) -&gt; 2023:4(baseline/break) -&gt; 2024:4(baseline/break)">&#9888; review</span></td>
-</tr><tr class="needs-review" data-team="dbleykhman" data-eligible="true">
+    <td>1</td>
+    <td><strong>1</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 2), history confirms 1 (Keeper Round 1). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:4(baseline/normal-pick) -&gt; 2022:3(is_keeper-flag) -&gt; 2023:4(traded-pick-but-round-too-late) -&gt; 2024:4(traded-pick-but-round-too-late)">&#9888; corrected</span></td>
+</tr><tr class="ineligible needs-review" data-team="dbleykhman" data-eligible="false">
     <td>dbleykhman</td>
     <td>Garrett Wilson</td>
     <td>WR</td>
     <td>4</td>
     <td class="col-hide-mobile">45</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
-    <td>True</td>
-    <td>2</td>
-    <td><strong>1</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 2, history (draft rounds + Keeper Selections sheets) suggests 3. this would flip eligibility to NOT ELIGIBLE. Verify before correcting. Trail: 2021:None(not-drafted) -&gt; 2022:9(baseline/break) -&gt; 2023:8(round-match) -&gt; 2024:6(sheet-record+round-match)">&#9888; review</span></td>
+    <td>False</td>
+    <td>3</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 2 (Keeper Round 1), history confirms 3 (Keeper Round 0). Now NOT ELIGIBLE. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:9(baseline/normal-pick) -&gt; 2023:8(traded-pick) -&gt; 2024:6(traded-pick+sheet-record)">&#9888; corrected</span></td>
 </tr><tr class="ineligible" data-team="dbleykhman" data-eligible="false">
     <td>dbleykhman</td>
     <td>Xavier Worthy</td>
@@ -1256,17 +1257,17 @@
     <td>0</td>
     <td><strong>9</strong></td>
     <td></td>
-</tr><tr data-team="dbleykhman" data-eligible="true">
+</tr><tr class="ineligible needs-review" data-team="dbleykhman" data-eligible="false">
     <td>dbleykhman</td>
     <td>Nico Collins</td>
     <td>WR</td>
     <td>10</td>
     <td class="col-hide-mobile">113</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
-    <td>True</td>
-    <td>2</td>
-    <td><strong>7</strong></td>
-    <td></td>
+    <td>False</td>
+    <td>3</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 2 (Keeper Round 7), history confirms 3 (Keeper Round 6). Now NOT ELIGIBLE. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(wire-added) -&gt; 2023:16(traded-pick) -&gt; 2024:12(is_keeper-flag+sheet-record+round-does-not-match-formula(trusting is_keeper anyway))">&#9888; corrected</span></td>
 </tr><tr data-team="dbleykhman" data-eligible="true">
     <td>dbleykhman</td>
     <td>Dalton Kincaid</td>
@@ -1355,7 +1356,7 @@
     <td>0</td>
     <td><strong>11</strong></td>
     <td></td>
-</tr><tr data-team="jaw7475" data-eligible="true">
+</tr><tr class="needs-review" data-team="jaw7475" data-eligible="true">
     <td>jaw7475</td>
     <td>Rome Odunze</td>
     <td>WR</td>
@@ -1363,9 +1364,9 @@
     <td class="col-hide-mobile">49</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>0</td>
-    <td><strong>4</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>2</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 4), history confirms 2 (Keeper Round 2). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:8(traded-pick)">&#9888; corrected</span></td>
 </tr><tr class="ineligible" data-team="jaw7475" data-eligible="false">
     <td>jaw7475</td>
     <td>Jordan Addison</td>
@@ -1399,7 +1400,7 @@
     <td>0</td>
     <td><strong>11</strong></td>
     <td></td>
-</tr><tr data-team="jaw7475" data-eligible="true">
+</tr><tr class="needs-review" data-team="jaw7475" data-eligible="true">
     <td>jaw7475</td>
     <td>Brock Bowers</td>
     <td>TE</td>
@@ -1407,9 +1408,9 @@
     <td class="col-hide-mobile">84</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>5</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>4</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 5), history confirms 2 (Keeper Round 4). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:8(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="jaw7475" data-eligible="true">
     <td>jaw7475</td>
     <td>Cam Skattebo</td>
@@ -1619,7 +1620,7 @@
     <td>0</td>
     <td><strong>7</strong></td>
     <td></td>
-</tr><tr data-team="jpersily" data-eligible="true">
+</tr><tr class="needs-review" data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>Jared Goff</td>
     <td>QB</td>
@@ -1627,9 +1628,9 @@
     <td class="col-hide-mobile">92</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>6</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>5</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 6), history confirms 2 (Keeper Round 5). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(wire-added) -&gt; 2022:None(wire-added) -&gt; 2023:None(wire-added) -&gt; 2024:9(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="jpersily" data-eligible="true">
     <td>jpersily</td>
     <td>Chuba Hubbard</td>
@@ -2026,7 +2027,7 @@
     <td>1</td>
     <td><strong>4</strong></td>
     <td></td>
-</tr><tr data-team="spencerrubin7" data-eligible="true">
+</tr><tr class="needs-review" data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Jameson Williams</td>
     <td>WR</td>
@@ -2034,9 +2035,9 @@
     <td class="col-hide-mobile">83</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>5</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>4</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 5), history confirms 2 (Keeper Round 4). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:16(baseline/normal-pick) -&gt; 2023:None(wire-added) -&gt; 2024:8(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="spencerrubin7" data-eligible="true">
     <td>spencerrubin7</td>
     <td>Cameron Dicker</td>
@@ -2125,7 +2126,7 @@
     <td>0</td>
     <td><strong>NOT ELIGIBLE</strong></td>
     <td></td>
-</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
+</tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Tee Higgins</td>
     <td>WR</td>
@@ -2135,18 +2136,18 @@
     <td>True</td>
     <td>0</td>
     <td><strong>1</strong></td>
-    <td><span class="review-badge" title="times_kept looks undercounted: shown as 0, history (draft rounds + Keeper Selections sheets) suggests 1. this would flip eligibility to NOT ELIGIBLE. Verify before correcting. Trail: 2021:6(baseline/break) -&gt; 2022:5(is_keeper-flag+round-match) -&gt; 2023:3(is_keeper-flag+round-match) -&gt; 2024:3(baseline/break)">&#9888; review</span></td>
-</tr><tr data-team="zachjd5" data-eligible="true">
+    <td></td>
+</tr><tr class="ineligible needs-review" data-team="zachjd5" data-eligible="false">
     <td>zachjd5</td>
     <td>Malik Nabers</td>
     <td>WR</td>
     <td>3</td>
     <td class="col-hide-mobile">34</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
-    <td>True</td>
-    <td>1</td>
-    <td><strong>1</strong></td>
-    <td></td>
+    <td>False</td>
+    <td>2</td>
+    <td><strong>NOT ELIGIBLE</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 1), history confirms 2 (Keeper Round 0). Now NOT ELIGIBLE. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:4(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Chris Olave</td>
@@ -2169,7 +2170,7 @@
     <td>0</td>
     <td><strong>5</strong></td>
     <td></td>
-</tr><tr data-team="zachjd5" data-eligible="true">
+</tr><tr class="needs-review" data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Brian Thomas</td>
     <td>WR</td>
@@ -2177,9 +2178,9 @@
     <td class="col-hide-mobile">106</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>7</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>6</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 7), history confirms 2 (Keeper Round 6). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:10(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="zachjd5" data-eligible="true">
     <td>zachjd5</td>
     <td>Jayden Higgins</td>
@@ -2301,7 +2302,7 @@
     <td>0</td>
     <td><strong>2</strong></td>
     <td></td>
-</tr><tr data-team="zachmassey" data-eligible="true">
+</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Joe Burrow</td>
     <td>QB</td>
@@ -2309,9 +2310,9 @@
     <td class="col-hide-mobile">30</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>0</td>
-    <td><strong>2</strong></td>
-    <td></td>
+    <td>1</td>
+    <td><strong>1</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 0 (Keeper Round 2), history confirms 1 (Keeper Round 1). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(wire-added) -&gt; 2022:5(traded-pick) -&gt; 2023:4(traded-pick-but-round-too-late) -&gt; 2024:5(traded-pick-but-round-too-late)">&#9888; corrected</span></td>
 </tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Joe Mixon</td>
@@ -2378,7 +2379,7 @@
     <td>0</td>
     <td><strong>7</strong></td>
     <td></td>
-</tr><tr data-team="zachmassey" data-eligible="true">
+</tr><tr class="needs-review" data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Ricky Pearsall</td>
     <td>WR</td>
@@ -2386,9 +2387,9 @@
     <td class="col-hide-mobile">102</td>
     <td class="col-hide-mobile">NO CLAIMS</td>
     <td>True</td>
-    <td>1</td>
-    <td><strong>7</strong></td>
-    <td></td>
+    <td>2</td>
+    <td><strong>6</strong></td>
+    <td><span class="review-badge" title="times_kept auto-corrected (undercounted): was 1 (Keeper Round 7), history confirms 2 (Keeper Round 6). Still eligible. Confirmed via is_keeper flag or a verified traded draft pick each year (not roster continuity alone). Trail: 2021:None(not-drafted) -&gt; 2022:None(not-drafted) -&gt; 2023:None(not-drafted) -&gt; 2024:15(traded-pick)">&#9888; corrected</span></td>
 </tr><tr data-team="zachmassey" data-eligible="true">
     <td>zachmassey</td>
     <td>Jerry Jeudy</td>
