@@ -263,7 +263,15 @@ def generate_keeper_values(keeper_df, year, sheet_id):
     rows_html = ""
     for _, row in keeper_df.iterrows():
         eligible = str(row["Keeper Eligible"]).upper() == "TRUE"
-        cls = ' class="ineligible"' if not eligible else ""
+        review_flag = str(row.get("Review Flag", "") or "").strip()
+        row_classes = [] if eligible else ["ineligible"]
+        if review_flag:
+            row_classes.append("needs-review")
+        cls = f' class="{" ".join(row_classes)}"' if row_classes else ""
+        review_cell = (
+            f'<span class="review-badge" title="{_escape(review_flag)}">&#9888; review</span>'
+            if review_flag else ""
+        )
 
         rows_html += f"""<tr{cls} data-team="{_escape(row['Team'])}" data-eligible="{str(eligible).lower()}">
     <td>{_escape(row['Team'])}</td>
@@ -275,9 +283,15 @@ def generate_keeper_values(keeper_df, year, sheet_id):
     <td>{_escape(row['Keeper Eligible'])}</td>
     <td>{_escape(row['Times Kept'])}</td>
     <td><strong>{_escape(row['Keeper Round'])}</strong></td>
+    <td>{review_cell}</td>
 </tr>"""
 
     eligible_count = len(keeper_df[keeper_df["Keeper Eligible"] == True])  # noqa
+    review_count = int((keeper_df.get("Review Flag", "") != "").sum())
+    review_note = (
+        f' &middot; <span class="review-badge-inline">&#9888; {review_count} flagged for manual review</span>'
+        if review_count else ""
+    )
     sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/edit"
 
     return f"""{_head(f"Keeper Values {year}", "Full roster keeper values with filtering")}
@@ -287,7 +301,11 @@ def generate_keeper_values(keeper_df, year, sheet_id):
     <div class="page-header">
         <div class="page-header-icon">{_logo_page_header()}</div>
         <h1>Keeper Values {year}</h1>
-        <p class="subtitle">{len(keeper_df)} players &middot; {len(teams)} teams &middot; {eligible_count} eligible</p>
+        <p class="subtitle">{len(keeper_df)} players &middot; {len(teams)} teams &middot; {eligible_count} eligible{review_note}</p>
+        <p class="subtitle" style="font-size:0.82rem;">Times Kept / Keeper Rd trust Sleeper's is_keeper flag and the Keeper
+            Selections sheet. &#9888; review rows were continuously rostered (never dropped) long enough that history
+            <em>might</em> mean an unflagged keeper was missed &mdash; verify against real history before trusting the count,
+            continuous rostering alone doesn't prove a discount was exercised.</p>
         <a class="sheet-link" href="{sheet_url}" target="_blank">&#128196; Open in Google Sheets</a>
     </div>
 
@@ -323,6 +341,7 @@ def generate_keeper_values(keeper_df, year, sheet_id):
             <th data-col="6">Eligible <span class="sort-arrow"></span></th>
             <th data-col="7">Kept <span class="sort-arrow"></span></th>
             <th data-col="8">Keeper Rd <span class="sort-arrow"></span></th>
+            <th data-col="9">Review <span class="sort-arrow"></span></th>
         </tr></thead>
         <tbody>
 {rows_html}

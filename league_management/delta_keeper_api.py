@@ -106,6 +106,70 @@ def get_round_from_faab(faab):
     return FAAB_DEFAULT_ROUND
 
 
+def fetch_draft_picks_by_player(league_id):
+    """Fetch a league's most recent draft, keyed by player_id."""
+    drafts = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/drafts")
+    if not drafts:
+        return {}
+    picks = fetch_json(f"{SLEEPER_BASE}/draft/{drafts[0]['draft_id']}/picks")
+    return {str(p['player_id']): p for p in picks if p.get('player_id')}
+
+
+def fetch_wire_added_player_ids(league_id, weeks=NFL_WEEKS):
+    """
+    Player IDs added via waiver or free agency at any point in a season.
+
+    Used to detect when a player's keeper streak was actually broken (dropped
+    and picked back up off the wire). Trades are excluded on purpose — moving
+    a kept player between rosters doesn't reset his keeper clock.
+    """
+    added = set()
+    for week in range(1, weeks + 1):
+        txns = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/transactions/{week}")
+        for trans in txns:
+            if trans['status'] == 'failed' or trans['type'] not in ('waiver', 'free_agent'):
+                continue
+            if trans['adds']:
+                added.update(str(pid) for pid in trans['adds'])
+    return added
+
+
+def reconstruct_prior_keep_streak(player_id, history_seasons):
+    """
+    Reconstruct how many consecutive seasons a player has already been kept,
+    using Sleeper's own draft/transaction history rather than trusting a
+    single is_keeper checkbox — league operators running the live draft
+    sometimes forget to toggle it even though the player was never actually
+    dropped, which otherwise silently resets the keeper clock in the
+    Google Sheet this script self-references year over year.
+
+    history_seasons: seasons strictly before the one being computed, oldest
+    to newest, each {'picks': {player_id: pick}, 'wire_added': {player_id,...}}.
+
+    Returns (times_kept, still_on_roster). still_on_roster tells the caller
+    whether the player carried into the season being computed without a
+    wire-add reset, so a continuation there should count as a keep even if
+    is_keeper wasn't flagged that year either.
+    """
+    times_kept = 0
+    on_roster = False
+    for season in history_seasons:
+        pick = season['picks'].get(player_id)
+        wire_added = player_id in season['wire_added']
+        picked_this_season = pick is not None and not wire_added
+        if not picked_this_season:
+            times_kept = 0
+            on_roster = False
+            continue
+        explicit_keep = bool(pick.get('is_keeper'))
+        if explicit_keep or on_roster:
+            times_kept += 1
+        else:
+            times_kept = 0
+        on_roster = True
+    return times_kept, on_roster
+
+
 # ---------------------------------------------------------------------------
 # Helpers — Google Sheets
 # ---------------------------------------------------------------------------
@@ -277,10 +341,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     league_id = find_league_id(_MEMBER_USER_ID, LEAGUE_NAME, nfl_season)
     print(f"  Found '{LEAGUE_NAME}' {nfl_season} season (league ID: {league_id})")
 
-    drafts = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/drafts")
-    draft_id = drafts[0]['draft_id']
-    picks = fetch_json(f"{SLEEPER_BASE}/draft/{draft_id}/picks")
-    picks_by_player = {str(p['player_id']): p for p in picks}
+    picks_by_player = fetch_draft_picks_by_player(league_id)
     rosters = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/rosters")
     rosters_df = pd.DataFrame(rosters)
     roster_id_to_owner = {r['roster_id']: r['owner_id'] for r in rosters}
@@ -295,10 +356,15 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
 
     print("Fetching transactions...")
     waiver_adds_by_player = {}
+    current_wire_added = set()
     for week in range(1, NFL_WEEKS + 1):
         txns = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/transactions/{week}")
         for trans in txns:
-            if trans['status'] == 'failed' or trans['type'] != "waiver":
+            if trans['status'] == 'failed':
+                continue
+            if trans['type'] in ('waiver', 'free_agent') and trans['adds']:
+                current_wire_added.update(str(pid) for pid in trans['adds'])
+            if trans['type'] != "waiver":
                 continue
             if not trans['adds'] or len(trans['adds']) != 1:
                 continue
@@ -311,6 +377,24 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             }
             if pid not in waiver_adds_by_player or trans['leg'] > waiver_adds_by_player[pid]['trans_week']:
                 waiver_adds_by_player[pid] = rec
+
+    print("Reconstructing multi-season keeper streaks from Sleeper history...")
+    found_seasons = []
+    probe_season = nfl_season - 1
+    for _ in range(10):  # safety cap on lookback depth
+        try:
+            hist_league_id = find_league_id(_MEMBER_USER_ID, LEAGUE_NAME, probe_season)
+        except RuntimeError:
+            break
+        found_seasons.append((probe_season, hist_league_id))
+        probe_season -= 1
+    found_seasons.reverse()  # oldest -> newest
+    history_seasons = []
+    for season, hist_league_id in found_seasons:
+        hist_picks = fetch_draft_picks_by_player(hist_league_id)
+        hist_wire = fetch_wire_added_player_ids(hist_league_id)
+        history_seasons.append({'picks': hist_picks, 'wire_added': hist_wire})
+        print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_wire)} wire adds")
 
     print("Computing keeper values...")
     keeper_rows = []
@@ -337,6 +421,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             last_claim_date = -1
             times_kept = 0
             high_draft_pick = False
+            review_flag = ""
 
             pick = picks_by_player.get(player_id)
             if pick is not None:
@@ -347,13 +432,40 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     keeper_eligible = False
                 else:
                     keeper_round = min(round_ - 1, MAX_KEEPER_ROUND)
-                if pick['is_keeper'] or player_name in kept_player_names:
+                flagged_keeper = pick['is_keeper'] or player_name in kept_player_names
+                if flagged_keeper:
                     prev_tk = prev_keeper_by_id.get(str(player_info['player_id']))
                     if prev_tk is not None:
                         times_kept = int(prev_tk) + 1
                         keeper_round = round_ - (1 + times_kept)
                     else:
                         print(f"    WARNING: {player_name} flagged as keeper but not in previous year's sheet")
+
+                # Cross-check against draft/transaction history: is_keeper is a
+                # manual checkbox in Sleeper's draft room and gets missed. This
+                # does NOT override eligibility (continuous rostering alone is
+                # too noisy a signal -- plenty of studs never get dropped and
+                # are simply re-drafted at fair value, not "kept" at a discount).
+                # It only surfaces a review flag so a human can check real
+                # history, the way we confirmed Drake London's case.
+                wire_added_this_season = player_id in current_wire_added
+                reconstructed_prev_tk, continued_from_history = reconstruct_prior_keep_streak(
+                    player_id, history_seasons
+                )
+                if (
+                    round_ != 1
+                    and not flagged_keeper
+                    and not wire_added_this_season
+                    and continued_from_history
+                    and (reconstructed_prev_tk + 1) >= MAX_CONSECUTIVE_KEEPS
+                ):
+                    review_flag = (
+                        f"Continuously rostered, never dropped -- history suggests "
+                        f"times_kept could be {reconstructed_prev_tk + 1} "
+                        f"(>= max of {MAX_CONSECUTIVE_KEEPS}). Verify before trusting."
+                    )
+                    print(f"    REVIEW: {player_name} ({team_name}) - possible missed keep flag, "
+                          f"history suggests times_kept could be {reconstructed_prev_tk + 1}")
 
             rookie_adp = rookie_by_name.get(player_name)
             if rookie_adp is not None:
@@ -389,6 +501,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                 'keeper_eligible': keeper_eligible,
                 'times_kept': times_kept,
                 'keeper_round': keeper_round,
+                'review_flag': review_flag,
             })
 
     keeper_df = pd.DataFrame(keeper_rows)
@@ -401,8 +514,12 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     keeper_df.columns = [
         'Team', 'Player ID', 'Player Name', 'Position', 'Drafted Round',
         'Drafted Pick', 'Last Claim Amount', 'Last Claim Week',
-        'Keeper Eligible', 'Times Kept', 'Keeper Round',
+        'Keeper Eligible', 'Times Kept', 'Keeper Round', 'Review Flag',
     ]
+
+    flagged_count = int((keeper_df['Review Flag'] != "").sum())
+    if flagged_count:
+        print(f"  {flagged_count} player(s) flagged for manual keeper-history review (see 'Review Flag' column)")
 
     print(f"  Computed {len(keeper_df)} player rows across {keeper_df['Team'].nunique()} teams")
 
@@ -439,11 +556,11 @@ def export_local(keeper_df, current_year):
         highlight_row += players_by_team.iloc[ti]
         worksheet.set_row(highlight_row, None, border_blue if ti % 2 == 0 else bottom_border)
 
-    worksheet.conditional_format('A2:K1000', {
+    worksheet.conditional_format('A2:L1000', {
         'type': 'formula', 'criteria': '=$I2<>TRUE', 'format': fmt_ineligible,
     })
     worksheet.set_column('B:B', None, None, {'hidden': True})
-    worksheet.autofilter('A1:K1000')
+    worksheet.autofilter('A1:L1000')
     worksheet.set_column(7, 7, 19)
     worksheet.freeze_panes(1, 1)
     writer.close()
