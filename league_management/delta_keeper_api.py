@@ -159,7 +159,7 @@ def fetch_waiver_adds_detail(league_id, weeks=NFL_WEEKS):
     return detail
 
 
-def fetch_traded_pick_slots(league_id):
+def fetch_traded_pick_slots(league_id, season):
     """
     (round, roster_id) pairs for draft picks that changed hands before a
     league's draft that season -- i.e. NOT the team's own original slot.
@@ -170,9 +170,16 @@ def fetch_traded_pick_slots(league_id):
     that kind of keep. A traded pick used to draft a player already on that
     roster is strong, independently-provable evidence of a deliberate keep,
     even with no checkbox and no sheet record.
+
+    A single league_id's /traded_picks response covers every season with an
+    outstanding pick trade, not just this one -- teams can trade future
+    picks, so a 2024-season league_id's response includes 2025 entries too.
+    Filtering on season is required, not optional; without it, an
+    unrelated future-pick trade gets misread as evidence for a completely
+    different player's keeper status this season.
     """
     traded = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/traded_picks")
-    return {(t['round'], t['owner_id']) for t in traded}
+    return {(t['round'], t['owner_id']) for t in traded if str(t['season']) == str(season)}
 
 
 def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
@@ -507,7 +514,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
         for r in rosters
     }
 
-    current_traded_pick_slots = fetch_traded_pick_slots(league_id)
+    current_traded_pick_slots = fetch_traded_pick_slots(league_id, nfl_season)
 
     print("Fetching transactions...")
     waiver_adds_by_player = {}
@@ -548,7 +555,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     for season, hist_league_id in found_seasons:
         hist_picks = fetch_draft_picks_by_player(hist_league_id)
         hist_waiver_detail = fetch_waiver_adds_detail(hist_league_id)
-        hist_traded_slots = fetch_traded_pick_slots(hist_league_id)
+        hist_traded_slots = fetch_traded_pick_slots(hist_league_id, season)
         hist_kept_names = set()
         try:
             hist_sheet_id = find_keeper_sheet(drive_svc, season)
