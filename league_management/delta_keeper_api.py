@@ -590,18 +590,24 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             is_keeper_flag = bool(pick.get('is_keeper'))
             pick_was_traded = (rnd, rid) in season_data.get('traded_pick_slots', set())
             sheet_recorded = name in season_data.get('kept_names', set())
-            prev_tk, prev_round, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
-            round_makes_sense = prev_round is not None and (prev_round - (2 + prev_tk)) <= rnd <= (prev_round - (1 + prev_tk))
-            mech_confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
+            if rnd == 1 and FIRST_ROUND_INELIGIBLE:
+                mech_confirmed = False  # round-1 picks can never be a keeper, regardless of flags/round math
+            else:
+                prev_tk, prev_round, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
+                round_makes_sense = (
+                    prev_round is not None
+                    and (prev_round - (2 + prev_tk)) <= rnd <= (prev_round - (1 + prev_tk))
+                )
+                mech_confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
             if sheet_recorded and not mech_confirmed:
                 sheet_only.append(name)
             elif mech_confirmed and not sheet_recorded:
-                mech_only.append((name, 'is_keeper' if is_keeper_flag else 'traded-pick+round-match'))
+                mech_only.append((name, 'is_keeper' if is_keeper_flag else 'traded-pick+round-match', rnd))
         yr = season_data['season']
         if sheet_only:
             print(f"  [{yr}] sheet-only (trusted, no independent mechanical evidence): {', '.join(sorted(sheet_only))}")
         if mech_only:
-            details = ', '.join(f"{n} ({r})" for n, r in sorted(mech_only))
+            details = ', '.join(f"{n} ({r}, round {rd})" for n, r, rd in sorted(mech_only))
             print(f"  [{yr}] MECHANICAL-ONLY (evidence found, sheet silent): {details}")
         if not sheet_only and not mech_only:
             print(f"  [{yr}] sheet and mechanical evidence fully agree")
