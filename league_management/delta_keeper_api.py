@@ -272,17 +272,24 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     waiver_bid}}, 'kept_names': {player_name,...}, 'traded_pick_slots':
     {(round, roster_id),...}}.
 
-    Returns (times_kept, prev_round, trail). prev_round is the keeper-cost
-    baseline entering the season being computed (from a draft pick or a
-    FAAB claim, whichever applies), or None if the chain doesn't reach the
-    season right before the one being computed. trail is a list of
-    per-season dicts recording exactly which signal (or lack of one)
-    applied each year, for transparency before anyone corrects a sheet off
-    of this.
+    Returns (times_kept, prev_round, trail, has_strong_confirmation).
+    prev_round is the keeper-cost baseline entering the season being
+    computed (from a draft pick or a FAAB claim, whichever applies), or
+    None if the chain doesn't reach the season right before the one being
+    computed. trail is a list of per-season dicts recording exactly which
+    signal (or lack of one) applied each year, for transparency before
+    anyone corrects a sheet off of this. has_strong_confirmation is True
+    only if at least one season in the CURRENT unbroken streak was backed
+    by is_keeper or the sheet -- a streak resting entirely on
+    traded-pick+round-match coincidences, with no independent backing
+    anywhere in it, is exactly the single-instance pattern that produced
+    false positives before (Lamar Jackson, Brandon Aubrey, and ultimately
+    Joe Burrow) and callers should not trust on its own.
     """
     times_kept = 0
     prev_round = None
     trail = []
+    has_strong_confirmation = False  # was any confirmed season backed by is_keeper/the sheet, not traded-pick alone?
     for season in history_seasons:
         yr = season.get('season')
         pick = season['picks'].get(player_id)
@@ -294,14 +301,17 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
                 trail.append({'season': yr, 'round': None, 'signal': 'not-drafted'})
                 times_kept = 0
                 prev_round = None
+                has_strong_confirmation = False
             elif claimed_late:
                 trail.append({'season': yr, 'round': None, 'signal': 'waiver-after-deadline'})
                 times_kept = 0
                 prev_round = None
+                has_strong_confirmation = False
             else:
                 faab_round = get_round_from_faab(wire_detail['waiver_bid'])
                 trail.append({'season': yr, 'round': faab_round, 'signal': 'faab-baseline'})
                 times_kept = 0  # establishes a fresh cost, not itself a keep
+                has_strong_confirmation = False
                 # get_round_from_faab() already IS the computed keeper cost
                 # for next season (not a raw "round" to subtract from again)
                 # -- store it +1 so the general `prev_round - (1+times_kept)`
@@ -321,6 +331,7 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             trail.append({'season': yr, 'round': rnd, 'signal': 'first-round-ineligible'})
             times_kept = 0
             prev_round = None
+            has_strong_confirmation = False
             continue
 
         if prev_round is not None:
@@ -356,6 +367,8 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
 
         if confirmed:
             times_kept += 1
+            if is_keeper_flag or sheet_recorded:
+                has_strong_confirmation = True
             signals = []
             if is_keeper_flag:
                 signals.append('is_keeper-flag')
@@ -368,6 +381,7 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
         else:
             times_kept = 0
+            has_strong_confirmation = False
             if pick_was_traded and round_makes_sense and team_at_cap:
                 reason = 'traded-pick-round-matches-but-team-already-at-keeper-cap'
             elif pick_was_traded and not round_makes_sense:
@@ -384,9 +398,10 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
         if wire_detail is not None and not high_draft_pick and not claimed_late:
             prev_round = get_round_from_faab(wire_detail['waiver_bid']) + 1
             times_kept = 0
+            has_strong_confirmation = False
         else:
             prev_round = rnd
-    return times_kept, prev_round, trail
+    return times_kept, prev_round, trail, has_strong_confirmation
 
 
 # ---------------------------------------------------------------------------
@@ -667,7 +682,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             if rnd == 1 and FIRST_ROUND_INELIGIBLE:
                 mech_confirmed = False  # round-1 picks can never be a keeper, regardless of flags/round math
             else:
-                prev_tk, prev_round, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
+                prev_tk, prev_round, _, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
                 round_makes_sense = (
                     prev_round is not None
                     and (prev_round - (2 + prev_tk)) <= rnd <= (prev_round - (1 + prev_tk))
@@ -765,9 +780,10 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                 # prices the discount at the wrong tier (e.g. costed as a
                 # 1st-year keep when history says it's really the 2nd).
                 wire_added_this_season = player_id in current_wire_added
-                reconstructed_prev_tk, reconstructed_prev_round, reconstructed_trail = reconstruct_prior_keep_streak(
-                    player_id, player_name, history_seasons
-                )
+                (
+                    reconstructed_prev_tk, reconstructed_prev_round,
+                    reconstructed_trail, reconstructed_has_strong_confirmation,
+                ) = reconstruct_prior_keep_streak(player_id, player_name, history_seasons)
                 current_pick_was_traded = (round_, pick.get('roster_id')) in current_traded_pick_slots
                 if reconstructed_prev_round is not None:
                     current_expected = reconstructed_prev_round - (1 + reconstructed_prev_tk)
@@ -789,7 +805,17 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                         current_pick_was_traded and current_round_makes_sense and not current_team_at_cap
                     ))
                 )
-                if round_ != 1 and is_reconstructed_continuation:
+                # Whenever we reach this correction path, the current
+                # season's own confirmation is always the weaker
+                # traded-pick+round-match signal -- flagged_keeper (is_keeper
+                # or the sheet) would already have taken the primary path
+                # above. Require at least one OTHER year in the streak to be
+                # backed by is_keeper/the sheet, not just a chain of
+                # traded-pick coincidences with zero independent backing
+                # anywhere -- that pattern (Joe Burrow: a single, isolated
+                # traded-pick match with no prior confirmed history at all)
+                # is indistinguishable from luck.
+                if round_ != 1 and is_reconstructed_continuation and reconstructed_has_strong_confirmation:
                     reconstructed_times_kept = reconstructed_prev_tk + 1
                     if reconstructed_times_kept != times_kept:
                         corrected_round = round_ - (1 + reconstructed_times_kept)
