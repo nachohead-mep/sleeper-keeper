@@ -612,6 +612,17 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     for idx, season_data in audit_targets:
         prior_seasons = history_seasons[:idx]
         sheet_only, mech_only = [], []
+        strong_count_by_team = {}  # roster_id -> count of is_keeper/sheet-confirmed keepers this season
+        for pid, pick in season_data['picks'].items():
+            info = all_players.get(pid)
+            if info is None:
+                continue
+            name = f"{info['first_name']} {info['last_name']}"
+            rid = pick.get('roster_id')
+            is_keeper_flag = bool(pick.get('is_keeper'))
+            sheet_recorded = normalize_name(name) in season_data.get('kept_names', set())
+            if is_keeper_flag or sheet_recorded:
+                strong_count_by_team[rid] = strong_count_by_team.get(rid, 0) + 1
         for pid, pick in season_data['picks'].items():
             info = all_players.get(pid)
             if info is None:
@@ -634,7 +645,18 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             if sheet_recorded and not mech_confirmed:
                 sheet_only.append(name)
             elif mech_confirmed and not sheet_recorded:
-                mech_only.append((name, 'is_keeper' if is_keeper_flag else 'traded-pick+round-match', rnd))
+                if is_keeper_flag:
+                    label = 'is_keeper'
+                # A team can only keep NUM_KEEPERS players a season -- if
+                # this team already has that many is_keeper/sheet-confirmed
+                # keepers this year, an additional traded-pick-only finding
+                # is almost certainly a coincidental round match, not a
+                # real 4th keeper the sheet missed.
+                elif strong_count_by_team.get(rid, 0) >= NUM_KEEPERS:
+                    label = f'traded-pick+round-match, but team already has {strong_count_by_team[rid]} confirmed keepers -- likely coincidence'
+                else:
+                    label = 'traded-pick+round-match'
+                mech_only.append((name, label, rnd))
         yr = season_data['season']
         if sheet_only:
             print(f"  [{yr}] sheet-only (trusted, no independent mechanical evidence): {', '.join(sorted(sheet_only))}")
