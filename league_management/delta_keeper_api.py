@@ -288,8 +288,12 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             round_makes_sense = expected - 1 <= rnd <= expected
         else:
             # No baseline to check round math against (a true rookie debut,
-            # or the season right after a reset) -- round math can't apply.
-            round_makes_sense = True
+            # or the season right after a reset) -- a traded pick alone
+            # can't confirm anything here (ordinary draft-pick trading,
+            # completely unrelated to keepers, e.g. a rookie drafted with
+            # an acquired pick). Only is_keeper/the sheet can confirm a
+            # season with no real prior streak behind it.
+            round_makes_sense = False
 
         # The Keeper Selections sheet, when it has a record for this player
         # this year, is authoritative on its own -- it's the direct human
