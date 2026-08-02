@@ -561,9 +561,11 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
         hist_waiver_detail = fetch_waiver_adds_detail(hist_league_id)
         hist_traded_slots = fetch_traded_pick_slots(hist_league_id, season)
         hist_kept_names = set()
+        sheet_status = "not found"
         try:
             hist_sheet_id = find_keeper_sheet(drive_svc, season)
             hist_selections = read_sheet_tab(sheets_svc, hist_sheet_id, "Keeper Selections")
+            sheet_status = f"found ({hist_sheet_id}), tab has {len(hist_selections)} row(s)"
             for col in keeper_columns:
                 if col in hist_selections.columns:
                     hist_kept_names.update(hist_selections[col].dropna())
@@ -574,7 +576,8 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             'kept_names': hist_kept_names, 'traded_pick_slots': hist_traded_slots,
         })
         print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_waiver_detail)} waiver claims, "
-              f"{len(hist_kept_names)} sheet-recorded keepers, {len(hist_traded_slots)} traded pick slots")
+              f"{len(hist_kept_names)} sheet-recorded keepers, {len(hist_traded_slots)} traded pick slots "
+              f"[sheet: {sheet_status}]")
 
     # --- One-off audit: where do the sheet and the mechanical evidence disagree? ---
     # Sheet-only (sheet says kept, no is_keeper/traded-pick/round evidence) is
