@@ -32,6 +32,39 @@ from google.auth import default as google_auth_default
 from googleapiclient.discovery import build as google_build
 
 
+def build_canonical_name_lookup(all_players):
+    """{normalized_name: display_name} for every player Sleeper knows about."""
+    lookup = {}
+    for info in all_players.values():
+        if not info:
+            continue
+        display = f"{info.get('first_name','')} {info.get('last_name','')}"
+        lookup[normalize_name(display)] = display
+    return lookup
+
+
+def normalize_and_validate_names(raw_names, canonical_lookup, label):
+    """
+    Normalize a set of hand-typed sheet names and warn loudly about any
+    that don't resolve to a real Sleeper player even after normalization --
+    every name in the Keeper Selections sheet should match someone. A name
+    that doesn't (a genuine typo, e.g. "Jamhyr Gibbs" for "Jahmyr Gibbs" --
+    transposed letters aren't fixed by stripping punctuation) silently
+    drops that player's real keeper status out of every check that reads
+    the sheet, with no other signal to catch it. label identifies the
+    sheet/season in the warning.
+    """
+    normalized = set()
+    for raw in raw_names:
+        norm = normalize_name(raw)
+        normalized.add(norm)
+        if norm not in canonical_lookup:
+            print(f"    WARNING [{label}]: sheet name '{raw}' does not match any Sleeper player "
+                  f"even after normalization -- likely a typo in the sheet. This player's keeper "
+                  f"status from this entry will be silently missed everywhere until the sheet is fixed.")
+    return normalized
+
+
 def normalize_name(name):
     """
     Normalize a player name for matching Sleeper's canonical spelling
@@ -556,10 +589,10 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
 
     keepers_xl = read_sheet_tab(sheets_svc, prev_sheet_id, "Keeper Selections")
     keeper_columns = [f"keeper_{i}" for i in range(1, NUM_KEEPERS + 1)]
-    kept_player_names = set()
+    kept_player_names_raw = set()
     for col in keeper_columns:
         if col in keepers_xl.columns:
-            kept_player_names.update(normalize_name(n) for n in keepers_xl[col].dropna())
+            kept_player_names_raw.update(keepers_xl[col].dropna())
 
     # Read trade notes from previous rookie draft tab
     trade_notes = []
@@ -582,6 +615,10 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     roster_id_to_owner = {r['roster_id']: r['owner_id'] for r in rosters}
     users = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/users")
     all_players = fetch_json(f"{SLEEPER_BASE}/players/nfl")
+    canonical_name_lookup = build_canonical_name_lookup(all_players)
+    kept_player_names = normalize_and_validate_names(
+        kept_player_names_raw, canonical_name_lookup, f"Keeper Selections {nfl_season}"
+    )
 
     uid_to_name = {u['user_id']: u['display_name'] for u in users}
     rid_to_name = {
@@ -632,6 +669,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
         hist_picks = fetch_draft_picks_by_player(hist_league_id)
         hist_waiver_detail = fetch_waiver_adds_detail(hist_league_id)
         hist_traded_slots = fetch_traded_pick_slots(hist_league_id, season)
+        hist_kept_names_raw = set()
         hist_kept_names = set()
         sheet_status = "not found"
         try:
@@ -640,7 +678,10 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             sheet_status = f"found ({hist_sheet_id}), tab has {len(hist_selections)} row(s)"
             for col in keeper_columns:
                 if col in hist_selections.columns:
-                    hist_kept_names.update(normalize_name(n) for n in hist_selections[col].dropna())
+                    hist_kept_names_raw.update(hist_selections[col].dropna())
+            hist_kept_names = normalize_and_validate_names(
+                hist_kept_names_raw, canonical_name_lookup, f"Keeper Selections {season}"
+            )
         except FileNotFoundError:
             pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
         hist_strong_counts = compute_strong_keeper_counts(hist_picks, hist_kept_names, all_players)
