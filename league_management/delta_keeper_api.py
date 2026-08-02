@@ -44,7 +44,8 @@ def normalize_name(name):
     the sheet actually had them recorded all along.
     """
     name = str(name).lower()
-    name = re.sub(r"[.\-']", "", name)
+    name = re.sub(r"['.]", "", name)  # drop apostrophes/periods entirely (Amon's -> Amons, C.J. -> CJ)
+    name = re.sub(r"-", " ", name)  # hyphen -> space, not deletion (Amon-Ra -> "amon ra", not "amonra")
     name = re.sub(r"\s+", " ", name).strip()
     return name
 
