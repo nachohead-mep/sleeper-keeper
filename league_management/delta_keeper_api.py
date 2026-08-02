@@ -200,6 +200,31 @@ def fetch_traded_pick_slots(league_id, season):
     return {(t['round'], t['owner_id']) for t in traded if str(t['season']) == str(season)}
 
 
+def compute_strong_keeper_counts(picks, kept_names, all_players):
+    """
+    {roster_id: count of is_keeper/sheet-confirmed keepers} for a season.
+
+    A team can only keep NUM_KEEPERS players a season -- used to gate the
+    weaker traded-pick+round-match signal, since a team that already has
+    NUM_KEEPERS keepers confirmed by a strong signal (is_keeper flag or a
+    direct sheet record) cannot have a legitimate 4th, so an additional
+    traded-pick-only finding for that same team is almost certainly a
+    coincidental round match rather than a real keep the sheet missed.
+    """
+    counts = {}
+    for pid, pick in picks.items():
+        info = all_players.get(pid)
+        if info is None:
+            continue
+        name = f"{info['first_name']} {info['last_name']}"
+        is_keeper_flag = bool(pick.get('is_keeper'))
+        sheet_recorded = normalize_name(name) in kept_names
+        if is_keeper_flag or sheet_recorded:
+            rid = pick.get('roster_id')
+            counts[rid] = counts.get(rid, 0) + 1
+    return counts
+
+
 def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
     """
     Reconstruct how many consecutive seasons a player has already been kept.
@@ -319,7 +344,15 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
         # Sleeper's is_keeper checkbox and the round-cost formula are both
         # trying to reconstruct indirectly. Trust it outright rather than
         # requiring it to also line up with the round math.
-        confirmed = is_keeper_flag or sheet_recorded or (pick_was_traded and round_makes_sense)
+        #
+        # The traded-pick+round-match signal alone is NOT trusted if this
+        # team already has NUM_KEEPERS keepers confirmed by is_keeper/the
+        # sheet this season -- a team can't legally have a 4th keeper, so
+        # that combination is almost certainly a coincidental round match
+        # (confirmed for Josh Allen/DJ Moore's 2024 case: both disappear
+        # once their team's other 3 keepers are already accounted for).
+        team_at_cap = season.get('strong_keeper_counts', {}).get(rid, 0) >= NUM_KEEPERS
+        confirmed = is_keeper_flag or sheet_recorded or (pick_was_traded and round_makes_sense and not team_at_cap)
 
         if confirmed:
             times_kept += 1
@@ -335,8 +368,12 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             trail.append({'season': yr, 'round': rnd, 'signal': '+'.join(signals)})
         else:
             times_kept = 0
-            reason = 'traded-pick-but-round-too-late' if (pick_was_traded and not round_makes_sense) \
-                else 'baseline/normal-pick'
+            if pick_was_traded and round_makes_sense and team_at_cap:
+                reason = 'traded-pick-round-matches-but-team-already-at-keeper-cap'
+            elif pick_was_traded and not round_makes_sense:
+                reason = 'traded-pick-but-round-too-late'
+            else:
+                reason = 'baseline/normal-pick'
             trail.append({'season': yr, 'round': rnd, 'signal': reason})
 
         # A same-season waiver claim (in-season churn: dropped after the
@@ -537,6 +574,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     }
 
     current_traded_pick_slots = fetch_traded_pick_slots(league_id, nfl_season)
+    current_strong_keeper_counts = compute_strong_keeper_counts(picks_by_player, kept_player_names, all_players)
 
     print("Fetching transactions...")
     waiver_adds_by_player = {}
@@ -589,9 +627,11 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     hist_kept_names.update(normalize_name(n) for n in hist_selections[col].dropna())
         except FileNotFoundError:
             pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
+        hist_strong_counts = compute_strong_keeper_counts(hist_picks, hist_kept_names, all_players)
         history_seasons.append({
             'season': season, 'picks': hist_picks, 'waiver_detail': hist_waiver_detail,
             'kept_names': hist_kept_names, 'traded_pick_slots': hist_traded_slots,
+            'strong_keeper_counts': hist_strong_counts,
         })
         print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_waiver_detail)} waiver claims, "
               f"{len(hist_kept_names)} sheet-recorded keepers, {len(hist_traded_slots)} traded pick slots "
@@ -608,21 +648,12 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     audit_targets.append((len(history_seasons), {
         'season': nfl_season, 'picks': picks_by_player, 'waiver_detail': waiver_adds_by_player,
         'kept_names': kept_player_names, 'traded_pick_slots': current_traded_pick_slots,
+        'strong_keeper_counts': current_strong_keeper_counts,
     }))
     for idx, season_data in audit_targets:
         prior_seasons = history_seasons[:idx]
         sheet_only, mech_only = [], []
-        strong_count_by_team = {}  # roster_id -> count of is_keeper/sheet-confirmed keepers this season
-        for pid, pick in season_data['picks'].items():
-            info = all_players.get(pid)
-            if info is None:
-                continue
-            name = f"{info['first_name']} {info['last_name']}"
-            rid = pick.get('roster_id')
-            is_keeper_flag = bool(pick.get('is_keeper'))
-            sheet_recorded = normalize_name(name) in season_data.get('kept_names', set())
-            if is_keeper_flag or sheet_recorded:
-                strong_count_by_team[rid] = strong_count_by_team.get(rid, 0) + 1
+        strong_count_by_team = season_data.get('strong_keeper_counts', {})
         for pid, pick in season_data['picks'].items():
             info = all_players.get(pid)
             if info is None:
@@ -743,10 +774,20 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     current_round_makes_sense = current_expected - 1 <= round_ <= current_expected
                 else:
                     current_round_makes_sense = False
+                # Same cap check as the historical reconstruction: a team
+                # that already has NUM_KEEPERS keepers confirmed by
+                # is_keeper/the sheet this season can't have a legitimate
+                # 4th, so a traded-pick-only finding for that team is almost
+                # certainly a coincidental round match.
+                current_team_at_cap = (
+                    current_strong_keeper_counts.get(pick.get('roster_id'), 0) >= NUM_KEEPERS
+                )
                 is_reconstructed_continuation = (
                     reconstructed_prev_round is not None
                     and not wire_added_this_season
-                    and (flagged_keeper or (current_pick_was_traded and current_round_makes_sense))
+                    and (flagged_keeper or (
+                        current_pick_was_traded and current_round_makes_sense and not current_team_at_cap
+                    ))
                 )
                 if round_ != 1 and is_reconstructed_continuation:
                     reconstructed_times_kept = reconstructed_prev_tk + 1
