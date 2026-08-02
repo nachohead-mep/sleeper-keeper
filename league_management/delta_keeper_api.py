@@ -20,6 +20,7 @@ Players dropped after the deadline should be manually flagged.
 """
 
 import os
+import re
 from dotenv import load_dotenv
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '.env'))
 
@@ -29,6 +30,23 @@ import datetime
 
 from google.auth import default as google_auth_default
 from googleapiclient.discovery import build as google_build
+
+
+def normalize_name(name):
+    """
+    Normalize a player name for matching Sleeper's canonical spelling
+    against manually-typed sheet entries. The Keeper Selections sheet is
+    hand-typed by league members every year and doesn't reliably match
+    Sleeper's exact formatting -- "Devon Achane" vs "De'Von Achane",
+    "CJ Stroud" vs "C.J. Stroud", "Ceedee Lamb" vs "CeeDee Lamb", "Amon Ra
+    St. Brown" vs "Amon-Ra St. Brown" are all the same player in practice.
+    Exact-string matching was silently treating these as sheet gaps when
+    the sheet actually had them recorded all along.
+    """
+    name = str(name).lower()
+    name = re.sub(r"[.\-']", "", name)
+    name = re.sub(r"\s+", " ", name).strip()
+    return name
 
 # ---------------------------------------------------------------------------
 # League rules (Article VI) — update these if the constitution is amended
@@ -272,7 +290,7 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
         high_draft_pick = rnd <= HIGH_PICK_THRESHOLD
         is_keeper_flag = bool(pick.get('is_keeper'))
         pick_was_traded = (rnd, rid) in season.get('traded_pick_slots', set())
-        sheet_recorded = player_name in season.get('kept_names', set())
+        sheet_recorded = normalize_name(player_name) in season.get('kept_names', set())
 
         if rnd == 1 and FIRST_ROUND_INELIGIBLE:
             trail.append({'season': yr, 'round': rnd, 'signal': 'first-round-ineligible'})
@@ -488,7 +506,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
     kept_player_names = set()
     for col in keeper_columns:
         if col in keepers_xl.columns:
-            kept_player_names.update(keepers_xl[col].dropna())
+            kept_player_names.update(normalize_name(n) for n in keepers_xl[col].dropna())
 
     # Read trade notes from previous rookie draft tab
     trade_notes = []
@@ -568,7 +586,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             sheet_status = f"found ({hist_sheet_id}), tab has {len(hist_selections)} row(s)"
             for col in keeper_columns:
                 if col in hist_selections.columns:
-                    hist_kept_names.update(hist_selections[col].dropna())
+                    hist_kept_names.update(normalize_name(n) for n in hist_selections[col].dropna())
         except FileNotFoundError:
             pass  # no sheet for this season (predates the tracking spreadsheet) -- fine, just no signal
         history_seasons.append({
@@ -603,7 +621,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
             rid = pick.get('roster_id')
             is_keeper_flag = bool(pick.get('is_keeper'))
             pick_was_traded = (rnd, rid) in season_data.get('traded_pick_slots', set())
-            sheet_recorded = name in season_data.get('kept_names', set())
+            sheet_recorded = normalize_name(name) in season_data.get('kept_names', set())
             if rnd == 1 and FIRST_ROUND_INELIGIBLE:
                 mech_confirmed = False  # round-1 picks can never be a keeper, regardless of flags/round math
             else:
@@ -662,7 +680,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     keeper_eligible = False
                 else:
                     keeper_round = min(round_ - 1, MAX_KEEPER_ROUND)
-                flagged_keeper = pick['is_keeper'] or player_name in kept_player_names
+                flagged_keeper = pick['is_keeper'] or normalize_name(player_name) in kept_player_names
                 if flagged_keeper:
                     prev_tk = prev_keeper_by_id.get(str(player_info['player_id']))
                     if prev_tk is not None:
