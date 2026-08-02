@@ -158,6 +158,44 @@ def get_round_from_faab(faab):
     return FAAB_DEFAULT_ROUND
 
 
+def faab_keeper_baseline(bid):
+    """
+    A waiver-claim keeper-cost baseline, in the same "raw round" units as a
+    draft pick's round -- get_round_from_faab() already returns the final
+    computed cost for next season, not a round to subtract (1+times_kept)
+    from again, so this stores it +1 to make round_matches_keeper_cost's
+    general formula reproduce it exactly with times_kept=0 (the same way a
+    fresh, non-keeper draft pick's own round already satisfies round_-1
+    as its cost). Used both to establish a fresh baseline and to override
+    an existing one on a same-season waiver claim -- do not compute
+    get_round_from_faab(bid) + 1 inline, route it through here so both
+    call sites can't drift out of sync the way they briefly did.
+    """
+    return get_round_from_faab(bid) + 1
+
+
+def round_matches_keeper_cost(prev_round, times_kept, actual_round):
+    """
+    Does actual_round make sense as a keeper cost given the prior baseline?
+    Must be exactly prev_round - (1 + times_kept), or one round earlier (a
+    team without its own pick at the exact cost round substituting an
+    adjacent one it did have). Later (a higher round number) is
+    disqualifying -- that's underpaying the discount, impossible for a
+    real keep, so it proves the pick was a normal draft selection instead.
+    False with no baseline at all (prev_round is None) -- there's no
+    formula to check yet (a true rookie debut, or right after a reset).
+
+    Shared by the historical reconstruction, the live current-season
+    check, and the audit so all three apply the identical rule -- these
+    drifted out of sync before (the audit was briefly missing the
+    round-1 exclusion the other two already had).
+    """
+    if prev_round is None:
+        return False
+    expected = prev_round - (1 + times_kept)
+    return expected - 1 <= actual_round <= expected
+
+
 def fetch_draft_picks_by_player(league_id):
     """Fetch a league's most recent draft, keyed by player_id."""
     drafts = fetch_json(f"{SLEEPER_BASE}/league/{league_id}/drafts")
@@ -346,12 +384,7 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
                 trail.append({'season': yr, 'round': faab_round, 'signal': 'faab-baseline'})
                 times_kept = 0  # establishes a fresh cost, not itself a keep
                 has_strong_confirmation = False
-                # get_round_from_faab() already IS the computed keeper cost
-                # for next season (not a raw "round" to subtract from again)
-                # -- store it +1 so the general `prev_round - (1+times_kept)`
-                # check below reproduces it exactly with times_kept=0, same
-                # as how a fresh (non-keeper) draft pick's cost is round_-1.
-                prev_round = faab_round + 1
+                prev_round = faab_keeper_baseline(wire_detail['waiver_bid'])
             continue
 
         rnd = pick['round']
@@ -368,20 +401,11 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             has_strong_confirmation = False
             continue
 
-        if prev_round is not None:
-            # A real prior baseline exists (from a draft pick or a FAAB
-            # claim) to be continuing from -- a traded pick here is
-            # meaningful evidence, checked against the formula.
-            expected = prev_round - (1 + times_kept)
-            round_makes_sense = expected - 1 <= rnd <= expected
-        else:
-            # No baseline to check round math against (a true rookie debut,
-            # or the season right after a reset) -- a traded pick alone
-            # can't confirm anything here (ordinary draft-pick trading,
-            # completely unrelated to keepers, e.g. a rookie drafted with
-            # an acquired pick). Only is_keeper/the sheet can confirm a
-            # season with no real prior streak behind it.
-            round_makes_sense = False
+        # No baseline (a true rookie debut, or right after a reset) means a
+        # traded pick alone can't confirm anything -- ordinary draft-pick
+        # trading, unrelated to keepers. Only is_keeper/the sheet can
+        # confirm a season with no real prior streak behind it.
+        round_makes_sense = round_matches_keeper_cost(prev_round, times_kept, rnd)
 
         # The Keeper Selections sheet, when it has a record for this player
         # this year, is authoritative on its own -- it's the direct human
@@ -427,10 +451,9 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
         # A same-season waiver claim (in-season churn: dropped after the
         # draft, re-claimed later) overrides the draft-based cost for next
         # season, exactly like the live per-season computation -- his most
-        # recent acquisition method wins. Same +1 units fix as the
-        # standalone FAAB-baseline case above.
+        # recent acquisition method wins.
         if wire_detail is not None and not high_draft_pick and not claimed_late:
-            prev_round = get_round_from_faab(wire_detail['waiver_bid']) + 1
+            prev_round = faab_keeper_baseline(wire_detail['waiver_bid'])
             times_kept = 0
             has_strong_confirmation = False
         else:
@@ -725,10 +748,7 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                 mech_confirmed = False  # round-1 picks can never be a keeper, regardless of flags/round math
             else:
                 prev_tk, prev_round, _, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
-                round_makes_sense = (
-                    prev_round is not None
-                    and (prev_round - (2 + prev_tk)) <= rnd <= (prev_round - (1 + prev_tk))
-                )
+                round_makes_sense = round_matches_keeper_cost(prev_round, prev_tk, rnd)
                 mech_confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
             if sheet_recorded and not mech_confirmed:
                 sheet_only.append(name)
@@ -827,11 +847,9 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
                     reconstructed_trail, reconstructed_has_strong_confirmation,
                 ) = reconstruct_prior_keep_streak(player_id, player_name, history_seasons)
                 current_pick_was_traded = (round_, pick.get('roster_id')) in current_traded_pick_slots
-                if reconstructed_prev_round is not None:
-                    current_expected = reconstructed_prev_round - (1 + reconstructed_prev_tk)
-                    current_round_makes_sense = current_expected - 1 <= round_ <= current_expected
-                else:
-                    current_round_makes_sense = False
+                current_round_makes_sense = round_matches_keeper_cost(
+                    reconstructed_prev_round, reconstructed_prev_tk, round_
+                )
                 # Same cap check as the historical reconstruction: a team
                 # that already has NUM_KEEPERS keepers confirmed by
                 # is_keeper/the sheet this season can't have a legitimate
