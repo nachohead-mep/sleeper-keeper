@@ -279,14 +279,18 @@ def reconstruct_prior_keep_streak(player_id, player_name, history_seasons):
             # meaningful evidence, checked against the formula.
             expected = prev_round - (1 + times_kept)
             round_makes_sense = expected - 1 <= rnd <= expected
-            confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
         else:
-            # No baseline to check round math against -- a true rookie
-            # debut (a traded pick here is just ordinary draft-pick
-            # trading, unrelated to keepers), or a player being kept for
-            # the first time with nothing but the sheet to confirm it.
+            # No baseline to check round math against (a true rookie debut,
+            # or the season right after a reset) -- round math can't apply.
             round_makes_sense = True
-            confirmed = is_keeper_flag or sheet_recorded
+
+        # The Keeper Selections sheet, when it has a record for this player
+        # this year, is authoritative on its own -- it's the direct human
+        # record of what a team actually did, which is exactly what
+        # Sleeper's is_keeper checkbox and the round-cost formula are both
+        # trying to reconstruct indirectly. Trust it outright rather than
+        # requiring it to also line up with the round math.
+        confirmed = is_keeper_flag or sheet_recorded or (pick_was_traded and round_makes_sense)
 
         if confirmed:
             times_kept += 1
@@ -560,6 +564,47 @@ def compute_keepers(sheets_svc, drive_svc, nfl_season):
         })
         print(f"  {season}: {len(hist_picks)} draft picks, {len(hist_waiver_detail)} waiver claims, "
               f"{len(hist_kept_names)} sheet-recorded keepers, {len(hist_traded_slots)} traded pick slots")
+
+    # --- One-off audit: where do the sheet and the mechanical evidence disagree? ---
+    # Sheet-only (sheet says kept, no is_keeper/traded-pick/round evidence) is
+    # expected and fine -- the sheet is authoritative, this is exactly the
+    # traded-pick gap it exists to cover. Mechanical-only (evidence found,
+    # sheet silent) is the interesting category -- same pattern as Drake
+    # London, worth listing explicitly.
+    print("Auditing sheet vs. mechanical evidence across all drafted players...")
+    audit_targets = [(i, s) for i, s in enumerate(history_seasons) if s['kept_names']]
+    audit_targets.append((len(history_seasons), {
+        'season': nfl_season, 'picks': picks_by_player, 'waiver_detail': waiver_adds_by_player,
+        'kept_names': kept_player_names, 'traded_pick_slots': current_traded_pick_slots,
+    }))
+    for idx, season_data in audit_targets:
+        prior_seasons = history_seasons[:idx]
+        sheet_only, mech_only = [], []
+        for pid, pick in season_data['picks'].items():
+            info = all_players.get(pid)
+            if info is None:
+                continue
+            name = f"{info['first_name']} {info['last_name']}"
+            rnd = pick['round']
+            rid = pick.get('roster_id')
+            is_keeper_flag = bool(pick.get('is_keeper'))
+            pick_was_traded = (rnd, rid) in season_data.get('traded_pick_slots', set())
+            sheet_recorded = name in season_data.get('kept_names', set())
+            prev_tk, prev_round, _ = reconstruct_prior_keep_streak(pid, name, prior_seasons)
+            round_makes_sense = prev_round is not None and (prev_round - (2 + prev_tk)) <= rnd <= (prev_round - (1 + prev_tk))
+            mech_confirmed = is_keeper_flag or (pick_was_traded and round_makes_sense)
+            if sheet_recorded and not mech_confirmed:
+                sheet_only.append(name)
+            elif mech_confirmed and not sheet_recorded:
+                mech_only.append((name, 'is_keeper' if is_keeper_flag else 'traded-pick+round-match'))
+        yr = season_data['season']
+        if sheet_only:
+            print(f"  [{yr}] sheet-only (trusted, no independent mechanical evidence): {', '.join(sorted(sheet_only))}")
+        if mech_only:
+            details = ', '.join(f"{n} ({r})" for n, r in sorted(mech_only))
+            print(f"  [{yr}] MECHANICAL-ONLY (evidence found, sheet silent): {details}")
+        if not sheet_only and not mech_only:
+            print(f"  [{yr}] sheet and mechanical evidence fully agree")
 
     print("Computing keeper values...")
     keeper_rows = []
